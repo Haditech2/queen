@@ -130,6 +130,7 @@ Vercel CDN).
    | --- | --- |
    | `SECRET_KEY` | a long random string (generate: `python -c "import secrets;print(secrets.token_urlsafe(50))"`) |
    | `DEBUG` | `False` |
+   | `ADMIN_PASSWORD` | password for the `admin@mindbridge.africa` superuser |
    | `AI_API_KEY` | your Gemini / NVIDIA / DeepSeek / OpenAI key |
    | `AI_PROVIDER` | `gemini` (or `nvidia`, `deepseek`, `kimi`, `glm`, `openai`) |
    | `AI_MODEL` | the model name for that provider |
@@ -143,11 +144,10 @@ Vercel CDN).
    `collectstatic` for you.
 
 5. **After the first deploy**, open `https://<your-app>.vercel.app/` and sign in
-   to `/admin/` with the seeded account below, then **change the password
-   immediately**:
-
-   * Email: `admin@mindbridge.africa`
-   * Password: `AdminPassword2026!`
+   to `/admin/` with the seeded account (`admin@mindbridge.africa` and the
+   `ADMIN_PASSWORD` you set). If you deployed without `ADMIN_PASSWORD`, the
+   account is created with an unusable password and cannot be logged into —
+   set `ADMIN_PASSWORD` and redeploy to activate it.
 
 Redeploy after changing environment variables so the new values take effect.
 

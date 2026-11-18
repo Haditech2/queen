@@ -1,3 +1,6 @@
+import os
+
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from apps.accounts.models import CustomUser, UserProfile
@@ -20,19 +23,38 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE("Starting MindBridge database seeding..."))
 
         # 1. Superuser
-        admin_email = "admin@mindbridge.africa"
-        admin_pass = "AdminPassword2026!"
-        if not CustomUser.objects.filter(email=admin_email).exists():
+        # ADMIN_PASSWORD must be supplied in production (e.g. on Vercel). Without
+        # it the account is created with an unusable password so a public
+        # deployment never ships with a known admin login.
+        admin_email = os.getenv("ADMIN_EMAIL", "admin@mindbridge.africa")
+        admin_pass = os.getenv("ADMIN_PASSWORD", "")
+        if not admin_pass and settings.DEBUG:
+            admin_pass = "AdminPassword2026!"
+
+        existing_admin = CustomUser.objects.filter(email=admin_email).first()
+        if existing_admin is None:
             admin_user = CustomUser.objects.create_superuser(
                 email=admin_email,
-                password=admin_pass,
+                password=admin_pass or None,
                 first_name="MindBridge",
                 last_name="Administrator",
                 state_region="Lagos",
                 preferred_language="en",
                 preferred_communication_style="gentle"
             )
-            self.stdout.write(self.style.SUCCESS(f"Created Superuser: {admin_email} (Pass: {admin_pass})"))
+            if not admin_pass:
+                admin_user.set_unusable_password()
+                admin_user.save(update_fields=["password"])
+                self.stdout.write(self.style.WARNING(
+                    f"Created Superuser {admin_email} with an unusable password. "
+                    "Set ADMIN_PASSWORD and re-run seed_data to activate it."
+                ))
+            else:
+                self.stdout.write(self.style.SUCCESS(f"Created Superuser: {admin_email}"))
+        elif admin_pass and not existing_admin.has_usable_password():
+            existing_admin.set_password(admin_pass)
+            existing_admin.save(update_fields=["password"])
+            self.stdout.write(self.style.SUCCESS(f"Activated Superuser {admin_email} with ADMIN_PASSWORD."))
         else:
             self.stdout.write(f"Superuser {admin_email} already exists.")
 
