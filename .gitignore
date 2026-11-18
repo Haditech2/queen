@@ -24,6 +24,7 @@ media/
 # Vercel
 .vercel/
 .vercelignore
+.env.local
 
 # OS / editors
 .DS_Store
