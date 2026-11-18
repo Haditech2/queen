@@ -3,8 +3,13 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from apps.core.views import health_check_view
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # Deployment diagnostics (database reachability / migrations)
+    path('healthz/', health_check_view),
 
     # Core pages (Landing, Dashboard, About, Privacy, Terms)
     path('', include('apps.core.urls')),

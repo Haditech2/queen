@@ -25,6 +25,19 @@ def main():
     database_url = os.environ.get("DATABASE_URL", "")
 
     if not database_url.startswith(("postgres://", "postgresql://")):
+        database_url = ""
+
+    if not database_url:
+        database_url = next(
+            (
+                os.environ[name]
+                for name in ("POSTGRES_URL", "POSTGRES_PRISMA_URL", "POSTGRES_URL_NON_POOLING")
+                if os.environ.get(name)
+            ),
+            "",
+        )
+
+    if not database_url.startswith(("postgres://", "postgresql://")):
         print(
             "\n[build] No PostgreSQL DATABASE_URL found.\n"
             "[build] Skipping migrations and seeding.\n"

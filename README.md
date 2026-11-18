@@ -143,6 +143,11 @@ Vercel CDN).
    (safely skipped if `DATABASE_URL` is not a PostgreSQL URL yet). Vercel runs
    `collectstatic` for you.
 
+   Then open `https://<your-app>.vercel.app/healthz/` to confirm the database is
+   connected, migrations ran, and the admin user exists. If it reports
+   `"database_engine": "sqlite"`, no PostgreSQL database is attached yet — this
+   is why database-backed pages return a 500.
+
 5. **After the first deploy**, open `https://<your-app>.vercel.app/` and sign in
    to `/admin/` with the seeded account (`admin@mindbridge.africa` and the
    `ADMIN_PASSWORD` you set). If you deployed without `ADMIN_PASSWORD`, the

@@ -90,8 +90,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
 # Database
-# Supports PostgreSQL via DATABASE_URL, with local SQLite fallback for dev
-DATABASE_URL = os.getenv('DATABASE_URL', f"sqlite:///{BASE_DIR / 'mindbridge.sqlite3'}")
+# Supports PostgreSQL via DATABASE_URL, with local SQLite fallback for dev.
+# Vercel's Neon/Supabase integrations may expose the connection under a few
+# different names, so accept whichever one is present.
+DATABASE_URL = (
+    os.getenv('DATABASE_URL')
+    or os.getenv('POSTGRES_URL')
+    or os.getenv('POSTGRES_PRISMA_URL')
+    or os.getenv('POSTGRES_URL_NON_POOLING')
+    or f"sqlite:///{BASE_DIR / 'mindbridge.sqlite3'}"
+)
 DATABASES = {
     'default': dj_database_url.config(
         default=DATABASE_URL,

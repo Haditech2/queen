@@ -1,6 +1,9 @@
+import os
+
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.db import connection
+from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.conf import settings
 from pathlib import Path
@@ -48,6 +51,37 @@ def privacy_policy_view(request):
 
 def terms_of_service_view(request):
     return render(request, 'core/terms.html')
+
+
+def health_check_view(request):
+    """Lightweight deployment diagnostics (no secrets, no chat data)."""
+    from apps.accounts.models import CustomUser
+
+    info = {
+        'status': 'ok',
+        'debug': settings.DEBUG,
+        'database_engine': connection.vendor,
+    }
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+            cursor.fetchone()
+
+        tables = set(connection.introspection.table_names())
+        info['database'] = 'reachable'
+        info['migrations_applied'] = 'django_migrations' in tables
+        info['user_table_ready'] = CustomUser._meta.db_table in tables
+        if info['user_table_ready']:
+            info['admin_user_exists'] = CustomUser.objects.filter(
+                email=os.getenv('ADMIN_EMAIL', 'admin@mindbridge.africa')
+            ).exists()
+    except Exception as exc:  # pragma: no cover - diagnostic path
+        info['status'] = 'error'
+        info['database'] = 'unreachable'
+        info['error_type'] = type(exc).__name__
+
+    return JsonResponse(info, status=200 if info['status'] == 'ok' else 503)
 
 
 @login_required
