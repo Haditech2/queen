@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verified Nigerian Crisis Helplines & Emergency Support - MindBridge{% endblock %}
+
+{% block content %}
+<!-- EMERGENCY HERO -->
+<section class="emergency-hero py-4">
+  <div class="container">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-8">
+        <span class="badge mb-2"><i class="bi bi-life-preserver me-1" aria-hidden="true"></i> Emergency hub</span>
+        <h1 class="h3 fw-bold mb-1">Verified Nigerian crisis support &amp; helplines</h1>
+        <p class="mb-0 small" style="color:rgba(255,255,255,.85);">
+          Free, confidential support from trained human responders across Nigeria. If you are in immediate physical danger, please call <strong>112</strong> or go to the nearest emergency department right now.
+        </p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="tel:112" class="btn btn-light btn-lg fw-bold shadow">
+          <i class="bi bi-telephone-fill me-1" aria-hidden="true"></i> Call 112 national emergency
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container py-4">
+
+  <!-- STATE FILTER -->
+  <div class="mb-card p-3 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+      <div class="fw-semibold text-dark">
+        <i class="bi bi-funnel me-1 text-success" aria-hidden="true"></i> Filter helplines by state:
+      </div>
+      <div class="d-flex flex-wrap gap-1" role="navigation" aria-label="Filter by state">
+        {% for st in available_states %}
+        <a href="{% url 'resources:crisis_support' %}?state={{ st }}"
+           class="btn btn-sm {% if current_state == st %}btn-danger fw-bold{% else %}btn-light border{% endif %} rounded-pill">
+          {{ st }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- CRISIS RESOURCES LIST -->
+  <div class="row g-4 mb-5">
+    {% for res in resources %}
+    <div class="col-md-6">
+      <div class="mb-card h-100 p-4 d-flex flex-column justify-content-between {% if res.is_emergency_priority %}border-danger border-2{% endif %}">
+        <div>
+          <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+            <div>
+              {% if res.is_24_7 %}
+              <span class="badge bg-danger"><i class="bi bi-clock-history me-1" aria-hidden="true"></i> 24/7 service</span>
+              {% else %}
+              <span class="badge bg-secondary">{{ res.operating_hours }}</span>
+              {% endif %}
+              <span class="badge bg-light text-dark border ms-1">{{ res.location_state }}</span>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle">
+              <i class="bi bi-check-circle-fill me-1" aria-hidden="true"></i> Verified
+            </span>
+          </div>
+
+          <h2 class="h5 fw-bold mb-1 text-dark">{{ res.organization }}</h2>
+          <div class="text-danger fw-semibold small mb-2">{{ res.get_service_type_display }}</div>
+          <p class="small text-secondary mb-3">{{ res.description }}</p>
+
+          {% if res.notes %}
+          <div class="p-2 bg-light rounded-3 small text-muted mb-3 border">
+            <i class="bi bi-info-circle text-primary me-1" aria-hidden="true"></i> {{ res.notes }}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="pt-3 border-top d-flex flex-wrap gap-2 align-items-center justify-content-between">
+          <div class="d-flex gap-2 flex-wrap">
+            <a href="tel:{{ res.phone }}" class="btn btn-danger fw-bold">
+              <i class="bi bi-telephone-fill me-1" aria-hidden="true"></i> Call: {{ res.phone }}
+            </a>
+            {% if res.secondary_phone %}
+            <a href="tel:{{ res.secondary_phone }}" class="btn btn-outline-danger btn-sm">
+              Alt: {{ res.secondary_phone }}
+            </a>
+            {% endif %}
+          </div>
+          {% if res.website %}
+          <a href="{{ res.website }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border">
+            <i class="bi bi-box-arrow-up-right me-1" aria-hidden="true"></i> Website
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="empty-state">
+        <span class="empty-state-icon is-signal" aria-hidden="true"><i class="bi bi-telephone-x"></i></span>
+        <h2 class="h6 fw-bold mb-1">No helplines listed for this selection</h2>
+        <p class="mb-3">Try a different state, or call <strong>112</strong> for the national emergency line right now.</p>
+        <a href="{% url 'resources:crisis_support' %}" class="btn btn-primary-mb btn-sm">View all states</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- CRISIS SAFETY PLAN -->
+  <div class="p-4 p-md-5 rounded-4 bg-white border shadow-sm">
+    <h2 class="h4 fw-bold mb-3"><i class="bi bi-shield-shaded text-danger me-2" aria-hidden="true"></i>Immediate safety steps during a crisis</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="p-3 bg-light rounded-3 h-100">
+          <span class="badge bg-danger rounded-pill mb-2">1 &middot; Put time between thought and action</span>
+          <p class="small text-muted mb-0">
+            Intense emotional storms peak and subside. Promise yourself you will wait and take zero irreversible actions for the next 2 hours while seeking support.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-light rounded-3 h-100">
+          <span class="badge bg-danger rounded-pill mb-2">2 &middot; Tell a trusted person or helpline</span>
+          <p class="small text-muted mb-0">
+            Call a hotline above or text a trusted friend, family member, mentor, or neighbor. Tell them: <em>"I am going through a really intense crisis right now and need you to stay with me."</em>
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 bg-light rounded-3 h-100">
+          <span class="badge bg-danger rounded-pill mb-2">3 &middot; Make your environment safe</span>
+          <p class="small text-muted mb-0">
+            Step away from any lethal items, medications, or high places. Move to a public room, a living room with family, or visit a hospital emergency department.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

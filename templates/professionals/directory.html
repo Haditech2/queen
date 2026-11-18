@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verified Nigerian Healthcare Professionals & Centers - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-person-lines-fill" aria-hidden="true"></i>Professional healthcare referral directory</h1>
+      <p class="page-sub">Audited and verified clinical psychologists, psychiatrists, teaching hospitals, and accredited centers in Nigeria.</p>
+    </div>
+    <div class="page-actions">
+      <span class="badge bg-success-subtle text-success border border-success-subtle p-2">
+        <i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i> Strictly verified providers only
+      </span>
+    </div>
+  </div>
+
+  <!-- SEARCH & FILTER FORM -->
+  <form method="GET" class="mb-card p-3 mb-4">
+    <div class="row g-2 align-items-end">
+      <div class="col-6 col-md-3">
+        <label class="form-label" for="filterState">State / region</label>
+        <select name="state" id="filterState" class="form-select form-select-sm" onchange="this.form.submit()">
+          {% for st in states_list %}
+          <option value="{{ st }}" {% if state_filter == st %}selected{% endif %}>{{ st }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <label class="form-label" for="filterCategory">Category</label>
+        <select name="category" id="filterCategory" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="All">All categories</option>
+          {% for cat_val, cat_label in categories %}
+          <option value="{{ cat_val }}" {% if category_filter == cat_val %}selected{% endif %}>{{ cat_label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <label class="form-label" for="filterMode">Consultation mode</label>
+        <select name="mode" id="filterMode" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="All">Online &amp; in-person</option>
+          <option value="online" {% if mode_filter == 'online' %}selected{% endif %}>Online telehealth</option>
+          <option value="in_person" {% if mode_filter == 'in_person' %}selected{% endif %}>Physical in-person clinic</option>
+        </select>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <label class="form-label" for="filterQuery">Search specialist / hospital</label>
+        <div class="input-group input-group-sm">
+          <input type="text" id="filterQuery" name="q" value="{{ search_q }}" class="form-control" placeholder="Search keywords...">
+          <button class="btn btn-primary-mb" type="submit" aria-label="Search directory"><i class="bi bi-search" aria-hidden="true"></i></button>
+        </div>
+      </div>
+    </div>
+
+    {% if state_filter or category_filter != 'All' or mode_filter != 'All' or search_q %}
+      <div class="d-flex align-items-center gap-2 mt-3 pt-3 border-top small text-muted flex-wrap">
+        <span>Showing {{ professionals|length }} matching provider{{ professionals|length|pluralize }}</span>
+        <a href="{% url 'professionals:directory' %}" class="fw-semibold ms-auto">
+          <i class="bi bi-arrow-counterclockwise me-1" aria-hidden="true"></i>Reset filters
+        </a>
+      </div>
+    {% endif %}
+  </form>
+
+  <!-- PROFESSIONALS GRID -->
+  {% if professionals %}
+    <div class="row g-4">
+      {% for pro in professionals %}
+      <div class="col-md-6">
+        <div class="mb-card h-100 p-4 d-flex flex-column justify-content-between mb-card-interactive">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+              <span class="badge bg-success text-white">
+                <i class="bi bi-patch-check-fill me-1" aria-hidden="true"></i> Verified
+              </span>
+              <span class="badge bg-light text-dark border">{{ pro.get_consultation_mode_display }}</span>
+            </div>
+
+            <h2 class="h5 fw-bold mb-1 text-dark">{{ pro.name }}</h2>
+            <div class="text-success fw-medium small mb-2">{{ pro.title }}</div>
+            {% if pro.organization_name %}
+            <div class="small text-muted mb-2"><i class="bi bi-building me-1" aria-hidden="true"></i>{{ pro.organization_name }}</div>
+            {% endif %}
+
+            <div class="small text-muted mb-2">
+              <i class="bi bi-geo-alt-fill text-danger me-1" aria-hidden="true"></i>
+              <strong>{{ pro.city }}, {{ pro.state }} State</strong>
+              {% if pro.physical_address %}
+              <div class="text-secondary ps-3 mt-1">{{ pro.physical_address }}</div>
+              {% endif %}
+            </div>
+
+            <div class="p-2 rounded-3 bg-light small mb-3">
+              <div><strong>Services:</strong> {{ pro.services_offered }}</div>
+              <div><strong>Languages:</strong> {{ pro.languages_spoken }}</div>
+              <div><strong>Availability:</strong> {{ pro.availability_notes }}</div>
+            </div>
+
+            {% if pro.bio %}
+            <p class="small text-secondary mb-3">{{ pro.bio }}</p>
+            {% endif %}
+          </div>
+
+          <div class="pt-3 border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <a href="tel:{{ pro.phone }}" class="btn btn-sm btn-primary-mb">
+              <i class="bi bi-telephone-fill me-1" aria-hidden="true"></i> Call: {{ pro.phone }}
+            </a>
+            {% if pro.website %}
+            <a href="{{ pro.website }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-mb">
+              <i class="bi bi-globe me-1" aria-hidden="true"></i> Website
+            </a>
+            {% endif %}
+            {% if pro.email %}
+            <a href="mailto:{{ pro.email }}" class="btn btn-sm btn-light border">
+              <i class="bi bi-envelope me-1" aria-hidden="true"></i> Email
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state bg-white rounded-4 border">
+      <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-hospital"></i></span>
+      <h2 class="h6 fw-bold mb-1">No verified providers matched your search</h2>
+      <p class="mb-3">Try selecting "All States" or clearing your search filters.</p>
+      <a href="{% url 'professionals:directory' %}" class="btn btn-primary-mb">View all verified centers</a>
+    </div>
+  {% endif %}
+
+  <div class="alert alert-light border mt-5 p-4 rounded-3 small text-muted mb-0">
+    <i class="bi bi-shield-check text-success me-1" aria-hidden="true"></i>
+    <strong>Verification standard:</strong> MindBridge does not invent or fabricate healthcare practitioners. Only formally verified tertiary psychiatric hospitals, university teaching hospitals, and accredited practitioners entered by system administrators appear in this directory.
+  </div>
+</div>
+{% endblock %}

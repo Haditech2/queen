@@ -1,0 +1,352 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- TOP WELCOME BANNER -->
+  <div class="page-header">
+    <div>
+      <span class="badge bg-success-subtle text-success border border-success-subtle mb-2">
+        <i class="bi bi-clock me-1" aria-hidden="true"></i> {{ greeting_time }}
+      </span>
+      <h1 class="page-title">{{ greeting_time }}, {{ user.first_name }}</h1>
+      <p class="page-sub">Your chatbot is ready whenever you are. How are you holding up today?</p>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'mood:dashboard' %}" class="btn btn-outline-mb">
+        <i class="bi bi-emoji-smile me-1" aria-hidden="true"></i> Check in
+      </a>
+      <a href="{% url 'conversations:chat_new' %}" class="btn btn-primary-mb shadow-sm">
+        <i class="bi bi-chat-plus-fill me-1" aria-hidden="true"></i> New chat
+      </a>
+    </div>
+  </div>
+
+  <!-- NSUK CAMPUS WELLBEING & CASE STUDY BANNER -->
+  <div class="dashboard-banner p-3 p-md-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+          <span class="badge bg-success text-white"><i class="bi bi-mortarboard-fill me-1" aria-hidden="true"></i> NSUK case study</span>
+          {% if user.is_nsuk_affiliate %}
+            <span class="badge bg-white text-dark border">{{ user.get_nsuk_status_display|default:"NSUK Community" }}</span>
+            {% if user.faculty %}<span class="badge bg-white text-dark border">{{ user.get_faculty_display }}</span>{% endif %}
+            {% if user.level %}<span class="badge bg-white text-dark border">{{ user.get_level_display }}</span>{% endif %}
+            {% if user.residence_location %}<span class="badge bg-white text-dark border"><i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ user.get_residence_location_display }}</span>{% endif %}
+          {% else %}
+            <span class="badge bg-white text-muted border">General / unspecified affiliate</span>
+          {% endif %}
+        </div>
+        <h2 class="h6 fw-bold mb-1 text-dark">Nasarawa State University, Keffi (NSUK) support channel</h2>
+        <p class="text-secondary small mb-0">
+          {% if user.is_nsuk_affiliate and user.department %}
+            Tailored support active for <strong>{{ user.department }}</strong>{% if user.residence_location %} residing around <strong>{{ user.get_residence_location_display }}</strong>{% endif %}.
+          {% else %}
+            Are you an NSUK student or staff member? <a href="{% url 'accounts:profile' %}" class="fw-semibold text-success">Update your profile</a> to unlock campus-specific guidance (Angwan Lambu, High Level, faculty stressors).
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="d-flex flex-wrap gap-2">
+        <a href="tel:08036152891" class="btn btn-sm btn-outline-success bg-white fw-bold shadow-sm text-nowrap" title="NSUK Health Centre Clinic">
+          <i class="bi bi-hospital me-1" aria-hidden="true"></i> Clinic: 0803 615 2891
+        </a>
+        <a href="tel:08035901234" class="btn btn-sm btn-outline-danger bg-white fw-bold shadow-sm text-nowrap" title="FMC Keffi Psychiatric Ward">
+          <i class="bi bi-heart-pulse me-1" aria-hidden="true"></i> FMC Keffi: 0803 590 1234
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADLINE METRICS -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-tile">
+        <div class="stat-tile-head">
+          <span class="stat-tile-label">Avg. stress</span>
+          <span class="stat-tile-icon"><i class="bi bi-activity" aria-hidden="true"></i></span>
+        </div>
+        <span class="stat-tile-value">{% if avg_stress %}{{ avg_stress }}<small style="font-size:.5em;color:var(--ink-muted);">/10</small>{% else %}&mdash;{% endif %}</span>
+        <span class="stat-tile-note">Across your last {{ chart_labels|length }} check-ins</span>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-tile">
+        <div class="stat-tile-head">
+          <span class="stat-tile-label">Check-ins</span>
+          <span class="stat-tile-icon"><i class="bi bi-calendar-heart" aria-hidden="true"></i></span>
+        </div>
+        <span class="stat-tile-value">{{ checkin_count }}</span>
+        <span class="stat-tile-note">Daily reflections logged</span>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-tile">
+        <div class="stat-tile-head">
+          <span class="stat-tile-label">Chats</span>
+          <span class="stat-tile-icon"><i class="bi bi-chat-dots-fill" aria-hidden="true"></i></span>
+        </div>
+        <span class="stat-tile-value">{{ chat_count }}</span>
+        <span class="stat-tile-note">Private conversations</span>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-tile">
+        <div class="stat-tile-head">
+          <span class="stat-tile-label">Screeners</span>
+          <span class="stat-tile-icon"><i class="bi bi-clipboard2-pulse" aria-hidden="true"></i></span>
+        </div>
+        <span class="stat-tile-value">{{ screening_count }}</span>
+        <span class="stat-tile-note">Non-diagnostic assessments</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOOD TREND + TODAY'S CHECK-IN -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="mb-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div>
+            <h2 class="h6 fw-bold mb-1"><i class="bi bi-graph-up-arrow text-success me-2" aria-hidden="true"></i>Your mood trend</h2>
+            <small class="text-muted">How your recent check-ins have moved, most recent last.</small>
+          </div>
+          <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-outline-mb">Open tracker</a>
+        </div>
+
+        {% if chart_mood_data %}
+          <div class="mood-spark" data-mood-spark
+               data-values="{{ chart_mood_data|join:',' }}"
+               data-stress="{{ chart_stress_data|join:',' }}"
+               role="img"
+               aria-label="Mood trend across your last {{ chart_labels|length }} check-ins"></div>
+          {% if chart_labels|length > 1 %}
+            <div class="d-flex justify-content-between mt-2 small text-muted">
+              <span>{{ chart_labels|first }}</span>
+              <span>{{ chart_labels|last }}</span>
+            </div>
+          {% else %}
+            <p class="small text-muted mt-2 mb-0">
+              One check-in so far &mdash; log another and a trend line will appear here.
+            </p>
+          {% endif %}
+        {% else %}
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-graph-up"></i></span>
+            <h3 class="h6 fw-bold mb-1">No trend yet</h3>
+            <p class="mb-3">Log a few daily check-ins and your mood and stress pattern will appear here.</p>
+            <a href="{% url 'mood:dashboard' %}" class="btn btn-primary-mb btn-sm">Log your first check-in</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="mb-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-calendar-check text-success me-2" aria-hidden="true"></i>Today's check-in</h2>
+          <span class="badge bg-light text-muted border">Daily</span>
+        </div>
+
+        {% if today_checkin %}
+          <div class="p-3 rounded-3 bg-light text-center my-2">
+            <span class="display-5" aria-hidden="true">{{ today_checkin.mood_emoji }}</span>
+            <h3 class="h6 fw-bold mt-2 mb-1">{{ today_checkin.get_mood_display }}</h3>
+            <div class="small text-muted">Stress: <strong>{{ today_checkin.stress_level }}/10</strong> &middot; Sleep: <strong>{{ today_checkin.get_sleep_quality_display }}</strong></div>
+          </div>
+          <p class="small text-muted mt-2 mb-3">
+            {% if today_checkin.note %}"{{ today_checkin.note|truncatewords:15 }}"{% else %}Check-in recorded for today.{% endif %}
+          </p>
+          <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-outline-mb w-100">Update today's log</a>
+        {% else %}
+          <p class="text-muted small mb-3">
+            You haven't logged your emotional state today. Naming how you feel takes two minutes and builds real self-awareness.
+          </p>
+          <div class="d-flex justify-content-between mb-3">
+            <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-light border p-2 text-center flex-grow-1 mx-1" aria-label="Check in feeling great">😄<br><small>Great</small></a>
+            <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-light border p-2 text-center flex-grow-1 mx-1" aria-label="Check in feeling good">🙂<br><small>Good</small></a>
+            <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-light border p-2 text-center flex-grow-1 mx-1" aria-label="Check in feeling okay">😐<br><small>Okay</small></a>
+            <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-light border p-2 text-center flex-grow-1 mx-1" aria-label="Check in feeling low">😔<br><small>Low</small></a>
+            <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-light border p-2 text-center flex-grow-1 mx-1" aria-label="Check in feeling heavy">😣<br><small>Heavy</small></a>
+          </div>
+          <a href="{% url 'mood:dashboard' %}" class="btn btn-sm btn-primary-mb w-100">Complete full check-in</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT CHAT & SELF-ASSESSMENT -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-4 col-md-6">
+      <div class="mb-card h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-chat-dots-fill text-success me-2" aria-hidden="true"></i>Support chat</h2>
+          <span class="badge bg-success-subtle text-success">Culturally aware</span>
+        </div>
+        <p class="text-muted small mb-3">
+          Share your thoughts in English, Nigerian Pidgin, or your local context. A safe listener that never judges.
+        </p>
+
+        {% if recent_conversations %}
+          <div class="list-group list-group-flush mb-3">
+            {% for conv in recent_conversations|slice:":3" %}
+            <a href="{% url 'conversations:chat_detail' conv.id %}" class="list-group-item list-group-item-action border-0 px-2 py-2 rounded-3 mb-1 bg-light">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="small fw-semibold text-truncate" style="max-width: 180px;">{{ conv.title }}</span>
+                <small class="text-muted">{{ conv.updated_at|date:"M d" }}</small>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="p-3 bg-light rounded-3 text-center mb-3 small text-muted">
+            No chats yet. You can begin whenever you are ready.
+          </div>
+        {% endif %}
+
+        <a href="{% url 'conversations:chat_new' %}" class="btn btn-sm btn-primary-mb w-100">
+          <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> Start new conversation
+        </a>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="mb-card h-100 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-clipboard2-pulse text-warning me-2" aria-hidden="true"></i>Self-assessments</h2>
+          <span class="badge bg-warning-subtle text-warning">Non-diagnostic</span>
+        </div>
+        <p class="text-muted small mb-3">
+          Standardized clinical screeners (PHQ-9 for mood, GAD-7 for anxiety) to help you understand your experiences.
+        </p>
+
+        {% if recent_screenings %}
+          <div class="p-3 bg-light rounded-3 mb-3">
+            <small class="text-muted d-block">Latest screener</small>
+            <div class="fw-bold text-dark">{{ recent_screenings.0.tool.name }}</div>
+            <div class="d-flex justify-content-between small text-muted mt-1">
+              <span>Score: <strong>{{ recent_screenings.0.total_score }}</strong></span>
+              <span class="badge bg-success-subtle text-success">{{ recent_screenings.0.severity_label }}</span>
+            </div>
+          </div>
+        {% else %}
+          <div class="p-3 bg-light rounded-3 mb-3 small text-muted text-center">
+            No questionnaires completed yet.
+          </div>
+        {% endif %}
+
+        <a href="{% url 'screening:list' %}" class="btn btn-sm btn-outline-mb w-100">Take assessment screener</a>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-12">
+      <div class="mb-card h-100 p-4 dashboard-banner is-signal">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="rounded-circle p-2 bg-danger-subtle text-danger"><i class="bi bi-telephone-inbound-fill" aria-hidden="true"></i></span>
+          <h2 class="h6 fw-bold text-danger mb-0">Emergency resources</h2>
+        </div>
+        <p class="small text-muted mb-3">
+          Verified Nigerian mental health helplines for urgent human support.
+        </p>
+
+        <div class="d-flex flex-column gap-2 mb-3">
+          {% for res in crisis_resources %}
+          <div class="p-2 border rounded-3 bg-white">
+            <div class="d-flex justify-content-between align-items-center gap-2">
+              <strong class="small text-dark text-truncate">{{ res.organization|truncatechars:26 }}</strong>
+              <span class="badge bg-danger text-white">Free</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-1 gap-2">
+              <span class="small text-muted">{{ res.location_state }}</span>
+              <a href="tel:{{ res.phone }}" class="btn btn-sm btn-outline-danger py-0 px-2 fw-bold">{{ res.phone }}</a>
+            </div>
+          </div>
+          {% empty %}
+          <div class="p-3 bg-white border rounded-3 small text-muted text-center">No hotlines are listed right now.</div>
+          {% endfor %}
+        </div>
+
+        <div class="d-grid gap-2">
+          <a href="{% url 'resources:crisis_support' %}" class="btn btn-sm btn-danger">
+            <i class="bi bi-geo-alt me-1" aria-hidden="true"></i> Full crisis support hub
+          </a>
+          <a href="{% url 'professionals:directory' %}" class="btn btn-sm btn-outline-mb">
+            <i class="bi bi-person-lines-fill me-1" aria-hidden="true"></i> Find nearby therapists &amp; clinics
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COPING TOOLKIT -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="mb-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div>
+            <h2 class="h6 fw-bold mb-1"><i class="bi bi-flower1 text-success me-2" aria-hidden="true"></i>Recommended wellbeing exercises</h2>
+            <small class="text-muted">Evidence-informed tools to ground and steady yourself right now.</small>
+          </div>
+          <a href="{% url 'coping:list' %}" class="btn btn-sm btn-outline-mb">View all tools</a>
+        </div>
+
+        <div class="row g-3">
+          {% for tool in recommended_tools %}
+          <div class="col-md-6">
+            <div class="p-3 border rounded-3 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-success-subtle text-success border border-success-subtle">{{ tool.get_category_display }}</span>
+                  <small class="text-muted"><i class="bi bi-stopwatch me-1" aria-hidden="true"></i>{{ tool.duration_minutes }} mins</small>
+                </div>
+                <h3 class="h6 fw-bold mb-1">{{ tool.title }}</h3>
+                <p class="small text-muted mb-3">{{ tool.short_description }}</p>
+              </div>
+              <a href="{% url 'coping:detail' tool.slug %}" class="btn btn-sm btn-primary-mb w-100">
+                <i class="bi bi-play-circle me-1" aria-hidden="true"></i> Start exercise
+              </a>
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <div class="empty-state py-4">
+              <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-flower1"></i></span>
+              <h3 class="h6 fw-bold mb-1">No exercises yet</h3>
+              <p class="mb-0">The coping toolkit will appear here once it is available.</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="col-lg-4">
+      <div class="mb-card p-4 h-100">
+        <h2 class="h6 fw-bold mb-3"><i class="bi bi-megaphone text-success me-2" aria-hidden="true"></i>Announcements</h2>
+
+        {% if announcements %}
+          <div class="d-flex flex-column gap-3">
+            {% for note in announcements %}
+              <div class="p-3 border rounded-3 bg-light">
+                <h3 class="fw-bold small mb-1 text-dark">{{ note.title }}</h3>
+                <p class="small text-muted mb-0">{{ note.message|truncatewords:30 }}</p>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state py-4">
+            <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-bell-slash"></i></span>
+            <h3 class="h6 fw-bold mb-1">Nothing new</h3>
+            <p class="mb-0">There are no announcements right now.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

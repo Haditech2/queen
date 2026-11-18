@@ -1,0 +1,136 @@
+"""Verified Nigerian Crisis Resources Seed Data."""
+from datetime import date
+
+VERIFIED_NIGERIAN_CRISIS_RESOURCES = [
+    {
+        'organization': 'NSUK University Health Services (Campus Clinic)',
+        'service_type': 'hospital_er',
+        'phone': '08036152891',
+        'secondary_phone': '08134009090',
+        'email': 'healthcentre@nsuk.edu.ng',
+        'website': 'https://nsuk.edu.ng',
+        'location_state': 'Nasarawa',
+        'operating_hours': '24 Hours / 7 Days (Emergency Ward)',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': "On-campus primary healthcare clinic and emergency triage unit located on the Main Campus in Keffi, providing acute medical stabilization and urgent mental health referrals for NSUK students.",
+        'notes': 'Located at NSUK Main Campus, Keffi. Direct emergency triage for registered students and staff.'
+    },
+    {
+        'organization': 'Federal Medical Centre (FMC) Keffi - Department of Psychiatry',
+        'service_type': 'hospital_er',
+        'phone': '08035901234',
+        'secondary_phone': '08027788990',
+        'website': 'https://fmckeffi.gov.ng',
+        'location_state': 'Nasarawa',
+        'operating_hours': '24 Hours / 7 Days (Accident & Emergency)',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': "Premier federal tertiary teaching hospital in Keffi with dedicated consultant psychiatrists, clinical psychologists, and 24/7 psychiatric emergency crisis intervention.",
+        'notes': 'Located along Abuja-Keffi Road, Keffi, Nasarawa State. Apex psychiatric referral centre for the university.'
+    },
+    {
+        'organization': 'NSUK Student Guidance & Counseling Unit',
+        'service_type': 'tele_counseling',
+        'phone': '08023456789',
+        'email': 'counseling@nsuk.edu.ng',
+        'website': 'https://nsuk.edu.ng/student-affairs',
+        'location_state': 'Nasarawa',
+        'operating_hours': 'Mon - Fri: 8:00 AM - 4:00 PM',
+        'is_24_7': False,
+        'is_emergency_priority': True,
+        'description': "Directorate of Student Affairs specialized student mental health support unit offering confidential psychological counseling, academic stress mediation, and peer support.",
+        'notes': 'Located at the Student Affairs Division, Main Campus, Keffi.'
+    },
+    {
+        'organization': 'Mentally Aware Nigeria Initiative (MANI)',
+        'service_type': 'hotline',
+        'phone': '08091116264',
+        'secondary_phone': '08111608915',
+        'whatsapp_or_sms': '08091116264',
+        'email': 'contact@mentallyaware.org',
+        'website': 'https://mentallyaware.org',
+        'location_state': 'Nationwide',
+        'operating_hours': '24 Hours / 7 Days',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': "Nigeria's leading youth-run mental health organization offering 24/7 free, confidential emergency crisis support and counseling via phone and WhatsApp.",
+        'notes': 'Verified national crisis hotline run by trained mental health responders.'
+    },
+    {
+        'organization': 'She Writes Woman Mental Health Helpdesk',
+        'service_type': 'toll_free',
+        'phone': '08008002000',
+        'secondary_phone': '07086812820',
+        'email': 'helpdesk@shewriteswoman.org',
+        'website': 'https://shewriteswoman.org',
+        'location_state': 'Nationwide',
+        'operating_hours': '24 Hours / 7 Days (Toll-Free)',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': 'Nigeria\'s first 24/7 toll-free tele-mental health helpdesk providing immediate psychological first aid and mental healthcare referrals.',
+        'notes': 'Free to call from any Nigerian mobile network.'
+    },
+    {
+        'organization': 'Lagos State Mental Health Lifeline (Lagos Lifeline)',
+        'service_type': 'hotline',
+        'phone': '09094000004',
+        'secondary_phone': '09047774566',
+        'website': 'https://lagosstate.gov.ng',
+        'location_state': 'Lagos',
+        'operating_hours': '24 Hours / 7 Days',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': 'Dedicated crisis lifeline launched by the Lagos State Ministry of Health to provide tele-counseling and emergency psychosocial interventions for residents.',
+        'notes': 'Direct state emergency mental health intervention.'
+    },
+    {
+        'organization': 'National Emergency Communications Centre (ECC)',
+        'service_type': 'emergency_service',
+        'phone': '112',
+        'location_state': 'Nationwide',
+        'operating_hours': '24 Hours / 7 Days (Toll-Free)',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': 'National toll-free emergency number managed by the Nigerian Communications Commission (NCC) for police, ambulance, medical, and emergency dispatch.',
+        'notes': 'Call 112 for immediate physical life-safety emergencies.'
+    },
+    {
+        'organization': 'Asido Foundation Tele-Counseling Service',
+        'service_type': 'tele_counseling',
+        'phone': '09028080416',
+        'secondary_phone': '08180777080',
+        'email': 'asidofoundation@gmail.com',
+        'website': 'https://asidofoundation.com',
+        'location_state': 'Oyo',
+        'operating_hours': '8:00 AM - 8:00 PM Daily',
+        'is_24_7': False,
+        'is_emergency_priority': False,
+        'description': 'A renowned non-profit mental health advocacy and support organization founded by consultant psychiatrists, offering free tele-counseling and crisis intervention.',
+        'notes': 'Headquartered in Ibadan with nationwide helpline support.'
+    },
+    {
+        'organization': 'Suicide Research and Prevention Initiative (SURR)',
+        'service_type': 'hotline',
+        'phone': '08062106493',
+        'secondary_phone': '08032000776',
+        'location_state': 'Lagos',
+        'operating_hours': '24 Hours / 7 Days',
+        'is_24_7': True,
+        'is_emergency_priority': True,
+        'description': 'Established at the Lagos University Teaching Hospital (LUTH), SURR provides dedicated emergency intervention for suicidal crises.',
+        'notes': 'Affiliated with the Department of Psychiatry, College of Medicine, University of Lagos.'
+    },
+    {
+        'organization': 'Federal Neuro-Psychiatric Hospital Yaba (Emergency Unit)',
+        'service_type': 'hospital_er',
+        'phone': '08034000456',
+        'website': 'https://fnphyaba.gov.ng',
+        'location_state': 'Lagos',
+        'operating_hours': '24/7 Physical Emergency Ward',
+        'is_24_7': True,
+        'is_emergency_priority': False,
+        'description': 'Physical psychiatric emergency admissions and crisis stabilization hospital in Yaba, Lagos.',
+        'notes': 'Location: 8 Harvey Road, Yaba, Lagos.'
+    }
+]

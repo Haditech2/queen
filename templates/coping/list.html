@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Evidence-Informed Coping Toolkit - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-flower1" aria-hidden="true"></i>Evidence-informed coping toolkit</h1>
+      <p class="page-sub">Practical, step-by-step techniques to steady your body and mind during stressful moments.</p>
+    </div>
+    <div class="page-actions">
+      <span class="badge bg-success-subtle text-success border border-success-subtle p-2">
+        <i class="bi bi-shield-check me-1" aria-hidden="true"></i> General wellbeing support
+      </span>
+    </div>
+  </div>
+
+  <!-- Category Filter Pills -->
+  <div class="d-flex flex-wrap gap-2 mb-4" role="navigation" aria-label="Filter by category">
+    <a href="{% url 'coping:list' %}" class="btn btn-sm {% if not current_category %}btn-primary-mb{% else %}btn-light border{% endif %} rounded-pill">
+      All exercises
+    </a>
+    {% for cat_val, cat_name in categories %}
+    <a href="{% url 'coping:list' %}?category={{ cat_val }}"
+       class="btn btn-sm {% if current_category == cat_val %}btn-primary-mb{% else %}btn-light border{% endif %} rounded-pill">
+      {{ cat_name }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- TOOLS GRID -->
+  <div class="row g-4 mb-4">
+    {% for tool in tools %}
+    <div class="col-md-6 col-lg-4">
+      <div class="mb-card h-100 p-4 d-flex flex-column justify-content-between mb-card-interactive">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="rounded-circle p-2 bg-success-subtle text-success fs-5" aria-hidden="true">
+              <i class="bi {{ tool.icon }}"></i>
+            </span>
+            <span class="badge bg-light text-muted border"><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ tool.duration_minutes }} mins</span>
+          </div>
+
+          <h2 class="h5 fw-bold mb-2">{{ tool.title }}</h2>
+          <span class="badge bg-success-subtle text-success border border-success-subtle mb-2" style="font-size: 0.72rem;">{{ tool.get_category_display }}</span>
+          <p class="small text-muted mb-3">{{ tool.short_description }}</p>
+        </div>
+
+        <div class="pt-3 border-top">
+          <a href="{% url 'coping:detail' tool.slug %}" class="btn btn-primary-mb w-100">
+            <i class="bi bi-play-circle me-1" aria-hidden="true"></i> Start guided exercise
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="empty-state">
+        <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-flower1"></i></span>
+        <h2 class="h6 fw-bold mb-1">No exercises in this category</h2>
+        <p class="mb-3">Try another category, or view all exercises.</p>
+        <a href="{% url 'coping:list' %}" class="btn btn-primary-mb btn-sm">View all exercises</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="alert alert-light border p-4 rounded-3 small text-muted mb-0">
+    <i class="bi bi-info-circle-fill text-success me-1" aria-hidden="true"></i>
+    <strong>Disclaimer:</strong> Each tool in this toolkit provides general wellbeing and self-regulation exercises. It is not a substitute for formal diagnosis or professional mental healthcare.
+  </div>
+</div>
+{% endblock %}

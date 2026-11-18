@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Permanently Delete Account - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container auth-shell">
+  <div class="auth-card mb-card p-4 p-md-5 border-danger" style="max-width: 560px;">
+    <div class="text-center mb-4">
+      <span class="auth-icon is-signal" aria-hidden="true"><i class="bi bi-exclamation-triangle-fill"></i></span>
+      <h1 class="h4 fw-bold text-danger mb-2">Delete your MindBridge account</h1>
+      <p class="text-secondary small mb-0">
+        This action is <strong>permanent and irreversible</strong>. All your conversations, messages, daily mood
+        check-ins, and questionnaire scores will be immediately and completely deleted from our database.
+      </p>
+    </div>
+
+    <div class="p-3 rounded-3 bg-light border small text-muted mb-4">
+      <strong class="d-block text-dark mb-1">Before you go</strong>
+      You can export a copy of everything first. Under the NDPR, your records are yours &mdash; take them with you if
+        you want to keep them.
+    </div>
+
+    <a href="{% url 'accounts:export_data' %}" class="btn btn-outline-mb w-100 mb-3">
+      <i class="bi bi-file-earmark-arrow-down me-1" aria-hidden="true"></i> Download my data first
+    </a>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="mb-4 text-start">
+        <label class="form-label" for="confirmText">
+          To confirm, please type <strong>DELETE</strong> in the box below:
+        </label>
+        <input type="text" id="confirmText" name="confirm_text" class="form-control text-center fw-bold"
+               placeholder="Type DELETE" required autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="d-flex flex-column flex-sm-row gap-3">
+        <a href="{% url 'accounts:settings' %}" class="btn btn-light border flex-grow-1">Cancel</a>
+        <button type="submit" class="btn btn-danger flex-grow-1 fw-bold">Permanently delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

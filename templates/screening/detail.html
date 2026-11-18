@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ definition.name }} - MindBridge Self-Assessment{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 820px;">
+  <nav class="mb-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'core:dashboard' %}">Dashboard</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <a href="{% url 'screening:list' %}">Self-assessment</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <span aria-current="page">{{ definition.name }}</span>
+  </nav>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ definition.name }}</h1>
+      <p class="page-sub">{{ definition.description }}</p>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'screening:list' %}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> Back
+      </a>
+    </div>
+  </div>
+
+  <div class="alert alert-warning border-warning-subtle shadow-sm rounded-3 mb-4">
+    <div class="d-flex align-items-start gap-2">
+      <i class="bi bi-shield-exclamation text-warning fs-4" aria-hidden="true"></i>
+      <div>
+        <strong>Non-diagnostic screening tool</strong>
+        <p class="small mb-0 mt-1">
+          This questionnaire cannot diagnose a mental-health condition. It is intended to help identify whether speaking with a qualified healthcare professional may be useful.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANSWER PROGRESS -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <div class="flex-grow-1">
+      <div class="progress" style="height: 6px;" role="progressbar" aria-label="Questions answered" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="screeningProgressBar">
+        <div class="progress-bar bg-success" id="screeningProgress" style="width: 0%;"></div>
+      </div>
+    </div>
+    <small class="text-muted text-nowrap" id="screeningProgressText">0 of {{ definition.questions|length }} answered</small>
+  </div>
+
+  <form method="POST" class="mb-card p-4 p-md-5" id="screeningForm" data-loading-label="Calculating…">
+    {% csrf_token %}
+
+    <div class="p-3 bg-light rounded-3 mb-4 fw-semibold text-dark">
+      <i class="bi bi-question-circle me-1 text-success" aria-hidden="true"></i>
+      {{ definition.instructions }}
+    </div>
+
+    {% for question in definition.questions %}
+    <fieldset class="mb-4 pb-3 border-bottom">
+      <legend class="form-label fw-bold text-dark mb-2 p-0" style="font-size:.95rem;">
+        {{ forloop.counter }}. {{ question }}
+      </legend>
+
+      <div class="row g-2">
+        {% for opt in definition.options %}
+        <div class="col-6 col-md-3">
+          <label class="option-card">
+            <input type="radio" name="q_{{ forloop.parentloop.counter0 }}" value="{{ opt.value }}" required>
+            <span class="option-label">{{ opt.label }}</span>
+            <span class="option-points">{{ opt.value }} point{{ opt.value|pluralize }}</span>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+    {% endfor %}
+
+    <!-- Explicit Consent for Storage (Section 12) -->
+    <div class="form-check my-4 p-3 bg-light rounded-3 d-flex align-items-start gap-2">
+      <input class="form-check-input ms-0" type="checkbox" name="consent" id="consentStorage" checked>
+      <label class="form-check-label small text-muted" for="consentStorage">
+        <strong>Explicit storage consent:</strong> I agree to save this assessment score in my private MindBridge history for my personal tracking. (Uncheck if you wish to see the score without saving it).
+      </label>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-primary-mb btn-lg fw-bold">
+        <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Submit &amp; calculate evaluation
+      </button>
+      <a href="{% url 'screening:list' %}" class="btn btn-light border">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const form = document.getElementById('screeningForm');
+    if (!form) return;
+
+    const bar = document.getElementById('screeningProgress');
+    const barWrap = document.getElementById('screeningProgressBar');
+    const text = document.getElementById('screeningProgressText');
+    const groups = Array.from(form.querySelectorAll('fieldset'));
+    const total = groups.length;
+
+    function update() {
+      const answered = groups.filter(function (fs) {
+        const checked = fs.querySelector('input[type=radio]:checked');
+        return !!checked;
+      }).length;
+      const pct = total ? Math.round((answered / total) * 100) : 0;
+      bar.style.width = pct + '%';
+      barWrap.setAttribute('aria-valuenow', String(pct));
+      text.textContent = answered + ' of ' + total + ' answered';
+    }
+
+    form.addEventListener('change', update);
+    update();
+  })();
+</script>
+{% endblock %}

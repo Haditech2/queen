@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Chat History - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-clock-history" aria-hidden="true"></i>Chat history</h1>
+      <p class="page-sub">View, search, export, or safely clear past conversations.</p>
+    </div>
+    <div class="page-actions">
+      <form method="POST" action="{% url 'conversations:clear_all' %}"
+            data-confirm="This will permanently delete ALL of your chats, including their messages. This cannot be undone."
+            data-confirm-title="Clear all chat history"
+            data-confirm-text="Clear everything">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-danger">
+          <i class="bi bi-trash3 me-1" aria-hidden="true"></i> Clear all history
+        </button>
+      </form>
+      <a href="{% url 'conversations:chat_new' %}" class="btn btn-primary-mb">
+        <i class="bi bi-plus-lg me-1" aria-hidden="true"></i> New chat
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Filter -->
+  <form method="GET" action="{% url 'conversations:conversations_list' %}" class="mb-4" role="search">
+    <label for="chatSearch" class="visually-hidden">Search conversations</label>
+    <div class="input-group">
+      <span class="input-group-text bg-white"><i class="bi bi-search text-muted" aria-hidden="true"></i></span>
+      <input type="text" id="chatSearch" name="q" value="{{ query }}" class="form-control" placeholder="Search conversations by keywords or topic...">
+      <button class="btn btn-primary-mb" type="submit">Search</button>
+      {% if query %}
+      <a href="{% url 'conversations:conversations_list' %}" class="btn btn-light border">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  {% if conversations %}
+    <div class="row g-3">
+      {% for conv in conversations %}
+      <div class="col-md-6 col-lg-4">
+        <div class="mb-card h-100 p-3 d-flex flex-column justify-content-between mb-card-interactive">
+          <div>
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge bg-success-subtle text-success border border-success-subtle">{{ conv.language|upper }}</span>
+              <small class="text-muted">{{ conv.updated_at|date:"M d, Y" }}</small>
+            </div>
+            <h2 class="h6 fw-bold mb-2">{{ conv.title }}</h2>
+            <p class="small text-muted mb-3">
+              {{ conv.messages.count }} message{{ conv.messages.count|pluralize }}
+            </p>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+            <a href="{% url 'conversations:chat_detail' conv.id %}" class="btn btn-sm btn-primary-mb">
+              <i class="bi bi-chat-text me-1" aria-hidden="true"></i> Open
+            </a>
+            <div class="d-flex gap-1">
+              <a href="{% url 'conversations:export_conversation' conv.id %}" class="btn btn-sm btn-light border" title="Export Markdown" aria-label="Export {{ conv.title }} as Markdown">
+                <i class="bi bi-download" aria-hidden="true"></i>
+              </a>
+              <form method="POST" action="{% url 'conversations:delete_conversation' conv.id %}" class="d-inline"
+                    data-confirm="Delete this conversation permanently?"
+                    data-confirm-title="Delete conversation"
+                    data-confirm-text="Delete">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete" aria-label="Delete {{ conv.title }}">
+                  <i class="bi bi-trash3" aria-hidden="true"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state bg-white rounded-4 border">
+      <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-chat-square-dots"></i></span>
+      <h2 class="h6 fw-bold mb-1">No chats found</h2>
+      <p class="mb-3">
+        {% if query %}No results matched "{{ query }}". Try searching for different keywords.{% else %}You haven't started a chat yet.{% endif %}
+      </p>
+      <a href="{% url 'conversations:chat_new' %}" class="btn btn-primary-mb">Start a new conversation</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Privacy Policy - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 860px;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-shield-lock-fill" aria-hidden="true"></i>Privacy policy</h1>
+      <p class="page-sub">Last updated: September 2026 &middot; Compliant with the Nigeria Data Protection Regulation (NDPR) and global privacy frameworks.</p>
+    </div>
+  </div>
+
+  <div class="mb-card p-4 p-md-5">
+    <p class="text-secondary">
+      At MindBridge, we recognize that emotional reflections and mental health inquiries represent some of the most sensitive personal data that an individual can express. We operate with a policy of <strong>strict data minimization, absolute confidentiality, and user sovereignty</strong>.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">1. Data minimization &amp; collection</h2>
+    <p class="small text-secondary">
+      We only collect the minimum details necessary to provide supportive listening: your email (for account protection), your preferred first name, and voluntary preferences regarding language and communication style. We never compel you to state sensitive personal matters.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">2. Zero unauthorized AI model training</h2>
+    <p class="small text-secondary">
+      Your private conversation transcripts, self-assessments, and personal reflections are <strong>never utilized to train public artificial intelligence models</strong>. Your data remains isolated to your user account.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">3. Security in transit &amp; storage</h2>
+    <p class="small text-secondary">
+      All traffic is protected using Transport Layer Security (TLS 1.3). Database access is restricted behind application-level controls, strict CSRF tokens, secure session cookies, and security headers.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">4. Full user data sovereignty</h2>
+    <ul class="small text-secondary">
+      <li><strong>Right of access &amp; export:</strong> You can download a structured JSON copy of all your interactions anytime under <a href="{% url 'accounts:settings' %}">Account Settings</a>.</li>
+      <li><strong>Right to permanent deletion:</strong> You can wipe individual reflections or permanently delete your entire user account and records instantly.</li>
+    </ul>
+
+    <h2 class="h6 fw-bold text-dark mt-4">5. Emergency interventions</h2>
+    <p class="small text-secondary">
+      In situations where an imminent crisis is detected, MindBridge will immediately present verified Nigerian emergency contact numbers on your screen to protect life. We do not disclose your reflections to unauthorized third parties.
+    </p>
+
+    <div class="alert alert-light border small text-muted mt-4 mb-0">
+      <i class="bi bi-info-circle-fill text-success me-1" aria-hidden="true"></i>
+      Questions about how your data is handled? Read the
+      <a href="{% url 'core:terms' %}">terms of service</a> or review the
+      <a href="{% url 'core:about' %}">About page</a> for how the safety pipeline works.
+    </div>
+  </div>
+</div>
+{% endblock %}

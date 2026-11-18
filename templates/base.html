@@ -1,0 +1,405 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f4ee" id="metaThemeColor">
+  <link rel="icon" href="{% static 'favicon.svg' %}?v={{ asset_version }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'favicon.svg' %}?v={{ asset_version }}">
+  <title>{% block title %}MindBridge Chatbot - Mental Health Support That Understands Your Context{% endblock %}</title>
+  <meta name="description" content="MindBridge is a culturally sensitive mental health support chatbot for NSUK students and Nigerian youths, with built-in crisis safety and verified emergency contacts.">
+
+  <!-- Self-hosted fonts (Fraunces + Inter, SIL Open Font License) -->
+  <link rel="stylesheet" href="{% static 'vendor/fonts/fonts.css' %}?v={{ asset_version }}">
+
+  <!-- Bootstrap 5 CSS & Bootstrap Icons (vendored locally — no third-party requests) -->
+  <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}?v={{ asset_version }}" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}?v={{ asset_version }}">
+
+  <!-- Custom MindBridge Styles -->
+  <link rel="stylesheet" href="{% static 'css/style.css' %}?v={{ asset_version }}">
+
+  <!-- Apply the saved theme before first paint so there is no flash of the wrong palette -->
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('mb-theme') || 'auto';
+        var dark = stored === 'dark' ||
+          (stored === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
+        document.getElementById('metaThemeColor').setAttribute('content', dark ? '#191816' : '#f7f4ee');
+      } catch (e) { /* storage blocked — keep the light default */ }
+    })();
+  </script>
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+  <!-- Keyboard users can jump straight past the nav -->
+  <a class="skip-link" href="#mainContent">Skip to main content</a>
+
+  <!-- ETHICAL MEDICAL DISCLAIMER BANNER -->
+  <div class="ethical-disclaimer-banner">
+    <i class="bi bi-shield-check" aria-hidden="true"></i>
+    <strong>MindBridge is an AI support chatbot, not a clinician.</strong>
+    <span class="d-none d-md-inline">It does not diagnose, prescribe, or replace licensed healthcare providers.</span>
+  </div>
+
+  <!-- NAVIGATION BAR -->
+  <nav class="navbar navbar-expand-lg navbar-mindbridge sticky-top" aria-label="Main navigation">
+    <div class="container-fluid px-lg-4">
+      <a class="navbar-brand navbar-brand-logo" href="{% if user.is_authenticated %}{% url 'core:dashboard' %}{% else %}{% url 'core:landing' %}{% endif %}">
+        <span class="brand-mark" aria-hidden="true"><i class="bi bi-chat-heart-fill"></i></span>
+        <span>MindBridge</span>
+        <span class="brand-badge d-none d-xl-inline">Support Chatbot &middot; NSUK</span>
+      </a>
+
+      <div class="d-flex align-items-center gap-2 order-lg-3">
+        <!-- Prominent Urgent Crisis Trigger -->
+        <button type="button" class="btn btn-urgent-crisis" data-bs-toggle="modal" data-bs-target="#globalCrisisModal" id="headerCrisisBtn">
+          <i class="bi bi-telephone-inbound-fill" aria-hidden="true"></i>
+          <span class="d-none d-md-inline">Urgent help</span>
+        </button>
+
+        <!-- Theme switcher -->
+        <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch colour theme" title="Switch colour theme">
+          <i class="bi bi-moon-stars-fill" aria-hidden="true"></i>
+          <i class="bi bi-sun-fill" aria-hidden="true"></i>
+        </button>
+
+        {% if user.is_authenticated %}
+        <div class="dropdown">
+          <button class="btn btn-light rounded-circle shadow-sm p-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Account menu">
+            <span class="user-avatar" aria-hidden="true">{{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}</span>
+            <span class="visually-hidden">Account menu</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2" style="border-radius: 12px; min-width: 240px;">
+            <li class="dropdown-account-head">
+              <div class="d-flex align-items-center gap-2">
+                <span class="user-avatar" aria-hidden="true">{{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}</span>
+                <div class="min-w-0">
+                  <div class="dropdown-account-name text-truncate">{{ user.first_name }} {{ user.last_name }}</div>
+                  <small class="dropdown-account-meta d-block text-truncate">{{ user.email }}</small>
+                </div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2" href="{% url 'core:dashboard' %}"><i class="bi bi-grid-1x2 me-2" aria-hidden="true"></i>Dashboard</a></li>
+            <li><a class="dropdown-item py-2" href="{% url 'conversations:chat' %}"><i class="bi bi-chat-dots me-2" aria-hidden="true"></i>Chat</a></li>
+            <li><a class="dropdown-item py-2" href="{% url 'conversations:conversations_list' %}"><i class="bi bi-clock-history me-2" aria-hidden="true"></i>Chat History</a></li>
+            <li><a class="dropdown-item py-2" href="{% url 'mood:dashboard' %}"><i class="bi bi-emoji-smile me-2" aria-hidden="true"></i>Mood Tracker</a></li>
+            <li><a class="dropdown-item py-2" href="{% url 'accounts:profile' %}"><i class="bi bi-person-gear me-2" aria-hidden="true"></i>Personalisation</a></li>
+            <li><a class="dropdown-item py-2" href="{% url 'accounts:settings' %}"><i class="bi bi-shield-lock me-2" aria-hidden="true"></i>Privacy &amp; Settings</a></li>
+            <li><a class="dropdown-item py-2" href="{% url 'accounts:export_data' %}"><i class="bi bi-download me-2" aria-hidden="true"></i>Export My Data</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2 text-danger" href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>Sign Out</a></li>
+          </ul>
+        </div>
+        {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline-mb btn-sm d-none d-sm-inline-block">Sign In</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary-mb btn-sm">Start<span class="d-none d-sm-inline"> Chatting</span></a>
+        {% endif %}
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="bi bi-list fs-3" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <div class="collapse navbar-collapse order-lg-2" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'core:dashboard' %}">
+              <i class="bi bi-grid-1x2 me-1" aria-hidden="true"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'chat' or request.resolver_match.url_name == 'chat_detail' %}active{% endif %}" href="{% url 'conversations:chat' %}">
+              <i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Chat
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'conversations_list' %}active{% endif %}" href="{% url 'conversations:conversations_list' %}">
+              <i class="bi bi-clock-history me-1" aria-hidden="true"></i> History
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'chat_new' %}active{% endif %}" href="{% url 'conversations:chat_new' %}">
+              <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> New Chat
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">
+              <i class="bi bi-info-circle me-1" aria-hidden="true"></i> About
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'list' and 'coping' in request.path %}active{% endif %}" href="{% url 'coping:list' %}">
+              <i class="bi bi-flower1 me-1" aria-hidden="true"></i> Coping Tools
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'screening' in request.path %}active{% endif %}" href="{% url 'screening:list' %}">
+              <i class="bi bi-clipboard2-check me-1" aria-hidden="true"></i> Self-Assessment
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if 'professionals' in request.path %}active{% endif %}" href="{% url 'professionals:directory' %}">
+              <i class="bi bi-person-lines-fill me-1" aria-hidden="true"></i> Find Support
+            </a>
+          </li>
+          {% endif %}
+          <li class="nav-item">
+            <a class="nav-link text-danger fw-semibold {% if 'crisis-support' in request.path %}active{% endif %}" href="{% url 'resources:crisis_support' %}">
+              <i class="bi bi-life-preserver me-1" aria-hidden="true"></i> Crisis Hub
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- DJANGO MESSAGES / ALERTS -->
+  <div class="container mt-3">
+    {% if messages %}
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+        <i class="bi bi-info-circle-fill me-2" aria-hidden="true"></i>
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- MAIN BODY CONTENT -->
+  <main id="mainContent" class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block crisis_fab %}
+  <!-- FLOATING EMERGENCY FAB -->
+  <button type="button" class="floating-crisis-btn" data-bs-toggle="modal" data-bs-target="#globalCrisisModal" title="Need urgent support? Click for verified Nigerian crisis hotlines.">
+    <i class="bi bi-telephone-fill" aria-hidden="true"></i>
+    <span>Crisis Helplines</span>
+  </button>
+  {% endblock %}
+
+  <!-- BACK TO TOP -->
+  <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">
+    <i class="bi bi-arrow-up" aria-hidden="true"></i>
+  </button>
+
+  <!-- GLOBAL VERIFIED CRISIS MODAL -->
+  <div class="modal fade" id="globalCrisisModal" tabindex="-1" aria-labelledby="globalCrisisModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+      <div class="modal-content shadow-lg border-0" style="border-radius: 20px;">
+        <div class="modal-header bg-danger text-white py-3" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+          <h5 class="modal-title fw-bold" id="globalCrisisModalLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2" aria-hidden="true"></i> Verified Nigerian Emergency &amp; Crisis Support
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-secondary mb-3">
+            If you or someone you know is in immediate danger, feeling suicidal, or experiencing a critical emergency, please reach out right now. These lines are free, confidential, and staffed by compassionate humans.
+          </p>
+
+          <!-- NSUK Campus & Keffi Dedicated Emergency Section -->
+          <div class="p-3 mb-4 rounded-3 border border-success-subtle bg-success-subtle">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-success"><i class="bi bi-mortarboard-fill me-1" aria-hidden="true"></i> NSUK Campus &amp; Keffi Immediate Services</span>
+            </div>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="p-2 bg-white rounded-3 border h-100">
+                  <div class="fw-bold small text-dark"><i class="bi bi-hospital text-danger me-1" aria-hidden="true"></i> NSUK University Health Services</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Main Campus Health Centre, Keffi (24/7 Triage)</div>
+                  <a href="tel:08036152891" class="btn btn-sm btn-outline-success mt-1 fw-bold w-100"><i class="bi bi-telephone me-1" aria-hidden="true"></i> Call Clinic: 0803 615 2891</a>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-2 bg-white rounded-3 border h-100">
+                  <div class="fw-bold small text-dark"><i class="bi bi-heart-pulse text-danger me-1" aria-hidden="true"></i> FMC Keffi - Psychiatry Dept</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Behavioral Medicine &amp; Emergency Psych Services</div>
+                  <a href="tel:08035901234" class="btn btn-sm btn-outline-danger mt-1 fw-bold w-100"><i class="bi bi-telephone me-1" aria-hidden="true"></i> Call FMC Keffi: 0803 590 1234</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <div class="p-3 border rounded-3 bg-light h-100">
+                <span class="badge bg-danger mb-2">24/7 National Crisis Line</span>
+                <h6 class="fw-bold mb-1">Mentally Aware Nigeria (MANI)</h6>
+                <p class="small text-muted mb-2">Nigeria's premier youth mental health emergency response team.</p>
+                <div class="d-flex flex-wrap gap-2">
+                  <a href="tel:08091116264" class="btn btn-sm btn-outline-danger"><i class="bi bi-telephone me-1" aria-hidden="true"></i> 0809 111 6264</a>
+                  <a href="tel:08111608915" class="btn btn-sm btn-outline-danger"><i class="bi bi-telephone me-1" aria-hidden="true"></i> 0811 160 8915</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 border rounded-3 bg-light h-100">
+                <span class="badge bg-success mb-2">Toll-Free Helpline</span>
+                <h6 class="fw-bold mb-1">She Writes Woman (SWW)</h6>
+                <p class="small text-muted mb-2">24/7 Toll-free tele-mental health helpdesk for immediate listening and first aid.</p>
+                <a href="tel:08008002000" class="btn btn-sm btn-success fw-bold"><i class="bi bi-telephone me-1" aria-hidden="true"></i> Call Toll-Free: 0800 800 2000</a>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 border rounded-3 bg-light h-100">
+                <span class="badge bg-primary mb-2">Lagos State Lifeline</span>
+                <h6 class="fw-bold mb-1">Lagos State Mental Health Lifeline</h6>
+                <p class="small text-muted mb-2">Ministry of Health psychosocial support and emergency intervention.</p>
+                <a href="tel:09094000004" class="btn btn-sm btn-outline-primary"><i class="bi bi-telephone me-1" aria-hidden="true"></i> 0909 400 0004</a>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 border rounded-3 bg-light h-100">
+                <span class="badge bg-dark mb-2">National Emergency Dispatch</span>
+                <h6 class="fw-bold mb-1">Emergency Service Centre</h6>
+                <p class="small text-muted mb-2">Police, Ambulance, and First Responders across all 36 states.</p>
+                <a href="tel:112" class="btn btn-sm btn-dark fw-bold"><i class="bi bi-telephone-fill me-1" aria-hidden="true"></i> Call 112 (Toll-Free)</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-warning mb-0 small" role="alert">
+            <i class="bi bi-heart-fill text-danger me-1" aria-hidden="true"></i>
+            <strong>You matter.</strong> If safe to do so, please consider remaining with a trusted friend, family member, or visiting the nearest hospital emergency room.
+          </div>
+        </div>
+        <div class="modal-footer bg-light py-2">
+          <a href="{% url 'resources:crisis_support' %}" class="btn btn-sm btn-outline-secondary">View State-By-State Directory</a>
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT MESSAGE MODAL -->
+  <div class="modal fade" id="reportMessageModal" tabindex="-1" aria-hidden="true" aria-labelledby="reportMessageModalLabel">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content shadow border-0" style="border-radius: 16px;">
+        <div class="modal-header">
+          <h6 class="modal-title fw-bold" id="reportMessageModalLabel"><i class="bi bi-flag-fill text-warning me-2" aria-hidden="true"></i>Report Chatbot Response</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="report_message_id" value="">
+          <p class="small text-muted mb-2">
+            MindBridge takes safety, non-diagnostic boundaries, and cultural respect seriously. Please share why this response felt inappropriate or unhelpful:
+          </p>
+          <label for="report_reason_input" class="visually-hidden">Reason for reporting this response</label>
+          <textarea class="form-control" id="report_reason_input" rows="3" placeholder="e.g. Felt overly clinical, sounded like a diagnosis, stereotyped my situation, or was insensitive..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-sm btn-primary-mb" id="submitReportBtn" onclick="submitMessageReport()">Submit Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GENERIC CONFIRMATION DIALOG (replaces native confirm) -->
+  <div class="modal fade confirm-dialog" id="mbConfirmModal" tabindex="-1" aria-labelledby="mbConfirmTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <div class="d-flex align-items-start gap-3">
+            <span class="confirm-icon is-primary" id="mbConfirmIcon" aria-hidden="true"><i class="bi bi-question-circle-fill"></i></span>
+            <div>
+              <h6 class="modal-title fw-bold mb-0" id="mbConfirmTitle">Please confirm</h6>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-3">
+          <p class="text-secondary small mb-0" id="mbConfirmBody">Are you sure you want to continue?</p>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-sm btn-light border" id="mbConfirmCancel" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-sm btn-primary-mb" id="mbConfirmAccept">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="mb-toast-stack" id="mbToastStack" role="region" aria-live="polite" aria-label="Notifications"></div>
+
+  {% block footer %}
+  <footer class="footer-mindbridge">
+    <div class="container">
+      <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+          <h2 class="footer-heading text-white fw-bold mb-2">MindBridge Chatbot <span class="badge bg-success text-white small fs-6">NSUK Case Study</span></h2>
+          <p class="text-secondary small mb-3">
+            A mental health support chatbot that understands your context. Adapted as an institutional case study for <strong>Nasarawa State University, Keffi (NSUK)</strong> and the broader Nigerian university ecosystem with cultural dignity, safety, and privacy at its core.
+          </p>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-success-subtle text-success border border-success-subtle">NSUK Health Centre Integrated</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">FMC Keffi Referral Bridge</span>
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Non-Diagnostic First-Line</span>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-4">
+          <h3 class="footer-heading text-white fw-semibold mb-3">Chatbot</h3>
+          <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+            <li><a href="{% url 'conversations:chat' %}">Open the Chat</a></li>
+            <li><a href="{% url 'conversations:chat_new' %}">Start a New Chat</a></li>
+            <li><a href="{% url 'conversations:conversations_list' %}">Chat History &amp; Search</a></li>
+            <li><a href="{% url 'accounts:profile' %}">Personalise the Chatbot</a></li>
+            <li><a href="{% url 'mood:dashboard' %}">Mood Tracker</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-4">
+          <h3 class="footer-heading text-white fw-semibold mb-3">When You Need a Human</h3>
+          <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+            <li><a href="{% url 'resources:crisis_support' %}">24/7 Crisis Hotline Directory</a></li>
+            <li><a href="{% url 'professionals:directory' %}">Verified Professionals &amp; Clinics</a></li>
+            <li><a href="tel:08036152891">NSUK Health Centre: 0803 615 2891</a></li>
+            <li><a href="tel:08091116264">MANI Helpline: 0809 111 6264</a></li>
+            <li><span class="text-white fw-bold">Emergency Police &amp; Med: 112</span></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-4">
+          <h3 class="footer-heading text-white fw-semibold mb-3">Ethics &amp; Privacy</h3>
+          <ul class="list-unstyled small d-flex flex-column gap-2 mb-0">
+            <li><a href="{% url 'core:about' %}">About the Chatbot</a></li>
+            <li><a href="{% url 'core:privacy' %}">Privacy Policy (NDPR Compliant)</a></li>
+            <li><a href="{% url 'core:terms' %}">Terms of Service</a></li>
+            <li><a href="{% url 'accounts:settings' %}">Data Minimization &amp; Rights</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="border-secondary opacity-25 my-4">
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary">
+        <div>&copy; {{ current_year }} MindBridge Africa. All rights reserved.</div>
+        <div class="mt-2 mt-md-0 text-center text-md-end">
+          An AI support chatbot. It never replaces human healthcare professionals.
+        </div>
+      </div>
+    </div>
+  </footer>
+  {% endblock %}
+
+  <!-- Bootstrap 5 JS Bundle (vendored locally) -->
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}?v={{ asset_version }}"></script>
+  <!-- MindBridge JS -->
+  <script src="{% static 'js/main.js' %}?v={{ asset_version }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Terms of Service - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 860px;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-file-text-fill" aria-hidden="true"></i>Terms of service</h1>
+      <p class="page-sub">Effective: September 2026</p>
+    </div>
+  </div>
+
+  <div class="mb-card p-4 p-md-5">
+    <div class="alert alert-warning p-3 rounded-3 small">
+      <strong>Essential clarification:</strong> MindBridge is an informational, emotional support, and self-reflection web platform. It is <strong>NOT an emergency service, hospital, medical clinic, psychiatrist, or licensed therapist</strong>.
+    </div>
+
+    <h2 class="h6 fw-bold text-dark mt-4">1. Scope of service</h2>
+    <p class="small text-secondary">
+      MindBridge offers culturally attuned first-line support, evidence-informed coping exercises (e.g. breathwork, grounding), educational materials, and a directory of verified Nigerian mental health centers.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">2. Medical &amp; emergency non-liability</h2>
+    <p class="small text-secondary">
+      If you are in acute crisis, experiencing severe medical symptoms, or having thoughts of self-harm or suicide, you must immediately contact local emergency services (112), call the MANI crisis line at 0809 111 6264, or visit the nearest hospital emergency department.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">3. Responsible use</h2>
+    <p class="small text-secondary">
+      Users agree not to attempt to bypass safety layers, generate harmful materials, or disrupt the availability of the platform for others.
+    </p>
+
+    <h2 class="h6 fw-bold text-dark mt-4">4. Your account</h2>
+    <p class="small text-secondary">
+      You are responsible for keeping your credentials confidential. You can change your password, export your data, or delete your account at any time from
+      <a href="{% url 'accounts:settings' %}">Privacy &amp; Settings</a>.
+    </p>
+
+    <div class="alert alert-light border small text-muted mt-4 mb-0">
+      <i class="bi bi-life-preserver text-danger me-1" aria-hidden="true"></i>
+      Need support right now? The
+      <a href="{% url 'resources:crisis_support' %}">crisis support hub</a> lists verified, free Nigerian hotlines with one-tap calling.
+    </div>
+  </div>
+</div>
+{% endblock %}

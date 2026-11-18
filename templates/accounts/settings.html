@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Account Settings & Privacy - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 780px;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-shield-lock" aria-hidden="true"></i> Security, privacy &amp; data rights</h1>
+      <p class="page-sub">Manage your password, export your personal records, or exercise your right to deletion.</p>
+    </div>
+  </div>
+
+  <!-- PASSWORD CHANGE -->
+  <div class="mb-card p-4 p-md-5 mb-4">
+    <h2 class="h6 fw-bold mb-3"><i class="bi bi-key-fill text-success me-2" aria-hidden="true"></i>Change password</h2>
+    <form method="POST" data-loading-label="Updating…">
+      {% csrf_token %}
+      <input type="hidden" name="change_password" value="1">
+
+      {% if password_form.errors %}
+        <div class="alert alert-danger small p-3 rounded-3" role="alert">
+          {% for field in password_form %}
+            {% for error in field.errors %}
+              <div>{{ field.label }}: {{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+          {% for error in password_form.non_field_errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label" for="{{ password_form.old_password.id_for_label }}">Current password</label>
+        <div class="password-wrap">
+          {{ password_form.old_password }}
+          <button type="button" class="password-toggle" data-password-toggle aria-label="Show password">
+            <i class="bi bi-eye" aria-hidden="true"></i>
+          </button>
+        </div>
+        {% if password_form.old_password.errors %}<div class="errorlist">{{ password_form.old_password.errors }}</div>{% endif %}
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label" for="{{ password_form.new_password.id_for_label }}">New password</label>
+          <div class="password-wrap">
+            {{ password_form.new_password }}
+            <button type="button" class="password-toggle" data-password-toggle aria-label="Show password">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          {% if password_form.new_password.errors %}<div class="errorlist">{{ password_form.new_password.errors }}</div>{% endif %}
+          <div class="pw-strength" data-strength-for="{{ password_form.new_password.id_for_label }}" data-level="0">
+            <div class="pw-strength-track"><div class="pw-strength-bar"></div></div>
+            <span class="pw-strength-label">At least 8 characters</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="{{ password_form.confirm_password.id_for_label }}">Confirm new password</label>
+          <div class="password-wrap">
+            {{ password_form.confirm_password }}
+            <button type="button" class="password-toggle" data-password-toggle aria-label="Show password">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          {% if password_form.confirm_password.errors %}<div class="errorlist">{{ password_form.confirm_password.errors }}</div>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary-mb">Update password</button>
+    </form>
+  </div>
+
+  <!-- EXPORT PERSONAL DATA (Section 16 & 17) -->
+  <div class="mb-card p-4 p-md-5 mb-4">
+    <h2 class="h6 fw-bold mb-2"><i class="bi bi-download text-success me-2" aria-hidden="true"></i>Export your personal data</h2>
+    <p class="text-muted small mb-3">
+      Under Nigeria Data Protection Regulation (NDPR) and GDPR principles, you have full ownership of your data. You can download a complete JSON export of all your conversations, messages, mood check-ins, and assessment scores anytime.
+    </p>
+    <a href="{% url 'accounts:export_data' %}" class="btn btn-outline-mb">
+      <i class="bi bi-file-earmark-arrow-down me-1" aria-hidden="true"></i> Download personal data export (JSON)
+    </a>
+  </div>
+
+  <!-- PERMANENT DELETION (Section 16) -->
+  <div class="mb-card p-4 p-md-5 border-danger">
+    <h2 class="h6 fw-bold text-danger mb-2"><i class="bi bi-trash3-fill text-danger me-2" aria-hidden="true"></i>Danger zone: delete account &amp; data</h2>
+    <p class="text-muted small mb-3">
+      Permanently delete your user account, entire chat history, mood logs, and assessment scores. This action cannot be reversed.
+    </p>
+    <a href="{% url 'accounts:delete_account' %}" class="btn btn-danger">
+      <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i> Proceed to permanent deletion
+    </a>
+  </div>
+</div>
+{% endblock %}

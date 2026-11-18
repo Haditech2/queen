@@ -1,0 +1,439 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ current_conversation.title }} - MindBridge Chatbot{% endblock %}
+
+{% block body_class %}page-chat{% endblock %}
+{% block crisis_fab %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-3 px-lg-4 py-2 py-md-3">
+  <div class="chat-container">
+
+    <!-- BACKDROP for the small-screen conversation drawer -->
+    <div class="chat-drawer-backdrop" id="chatDrawerBackdrop"></div>
+
+    <!-- LEFT SIDEBAR: CONVERSATIONS HISTORY -->
+    <aside class="chat-sidebar" id="chatSidebar" aria-label="Your conversations">
+      <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
+        <h6 class="fw-bold mb-0 text-success"><i class="bi bi-chat-heart me-1" aria-hidden="true"></i> Your Chats</h6>
+        <div class="d-flex align-items-center gap-1">
+          <a href="{% url 'conversations:chat_new' %}" class="btn btn-sm btn-primary-mb py-1 px-2" title="New Conversation">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> New
+          </a>
+          <button type="button" class="icon-btn d-md-none" id="chatDrawerClose" aria-label="Close conversation list" style="min-width:34px;height:34px;">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-2 border-bottom">
+        <form method="GET" action="{% url 'conversations:conversations_list' %}">
+          <label for="chatSidebarSearch" class="visually-hidden">Search your chats</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted" aria-hidden="true"></i></span>
+            <input type="text" id="chatSidebarSearch" name="q" class="form-control bg-light border-start-0" placeholder="Search chats...">
+          </div>
+        </form>
+      </div>
+
+      <div class="overflow-auto flex-grow-1 p-2">
+        {% if conversations %}
+          <div class="list-group list-group-flush">
+            {% for conv in conversations %}
+            <a href="{% url 'conversations:chat_detail' conv.id %}"
+               class="list-group-item list-group-item-action border-0 rounded-3 mb-1 py-2 px-3 {% if conv.id == current_conversation.id %}active bg-success-subtle text-success fw-bold{% else %}bg-transparent text-dark{% endif %}">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="text-truncate small" style="max-width: 180px;">{{ conv.title }}</span>
+                <span class="badge {% if conv.id == current_conversation.id %}bg-success text-white{% else %}bg-light text-muted border{% endif %} rounded-pill" style="font-size: 0.65rem;">
+                  {{ conv.language|upper }}
+                </span>
+              </div>
+              <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">{{ conv.updated_at|date:"M d, H:i" }}</small>
+            </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state py-4 px-2">
+            <span class="empty-state-icon" style="width:46px;height:46px;font-size:1.15rem;"><i class="bi bi-chat-square-text" aria-hidden="true"></i></span>
+            <h6 class="mb-1">No previous chats yet</h6>
+            <p class="mb-0">Start a new conversation and it will appear here.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="p-2 border-top bg-light text-center small">
+        <a href="{% url 'conversations:conversations_list' %}" class="text-muted"><i class="bi bi-gear me-1" aria-hidden="true"></i>Manage History</a>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT PANEL -->
+    <div class="chat-main">
+
+      <!-- CHAT HEADER -->
+      <div class="chat-header">
+        <button type="button" class="icon-btn d-md-none" id="chatDrawerOpen" aria-label="Open conversation list" aria-expanded="false" aria-controls="chatSidebar">
+          <i class="bi bi-list-ul" aria-hidden="true"></i>
+        </button>
+        <div class="chat-header-title">
+          <h1 class="h6 mb-0 text-truncate" id="activeConvTitle">{{ current_conversation.title }}</h1>
+          <div class="chat-header-sub">
+            <i class="bi bi-lock-fill" aria-hidden="true"></i> Private
+            <span class="d-none d-sm-inline">&middot; Replies in <strong id="currentLangLabel">{{ current_conversation.language|upper }}</strong></span>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-1 flex-shrink-0">
+          <div class="dropdown">
+            <button class="icon-btn icon-btn-labelled dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <span class="visually-hidden">Reply language:</span>
+              <i class="bi bi-translate" aria-hidden="true"></i> <span class="d-none d-sm-inline" id="selectedLangDisplay">Language</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end py-2" id="langSelectorMenu">
+              <li><h6 class="dropdown-header">Reply language</h6></li>
+              <li><button class="dropdown-item" type="button" onclick="switchLanguage('en', 'English')">English</button></li>
+              <li><button class="dropdown-item" type="button" onclick="switchLanguage('pcm', 'Nigerian Pidgin')">Nigerian Pidgin</button></li>
+              <li><button class="dropdown-item" type="button" onclick="switchLanguage('yo', 'Yoruba Context')">Yoruba context</button></li>
+              <li><button class="dropdown-item" type="button" onclick="switchLanguage('ha', 'Hausa Context')">Hausa context</button></li>
+              <li><button class="dropdown-item" type="button" onclick="switchLanguage('ig', 'Igbo Context')">Igbo context</button></li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Chat options" title="Chat options">
+              <i class="bi bi-three-dots" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end py-2">
+              <li><button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#renameConvModal"><i class="bi bi-pencil me-2" aria-hidden="true"></i>Rename</button></li>
+              <li><a class="dropdown-item" href="{% url 'conversations:export_conversation' current_conversation.id %}"><i class="bi bi-download me-2" aria-hidden="true"></i>Export as Markdown</a></li>
+              <li><a class="dropdown-item" href="{% url 'conversations:chat_new' %}"><i class="bi bi-plus-lg me-2" aria-hidden="true"></i>New chat</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="POST" action="{% url 'conversations:delete_conversation' current_conversation.id %}"
+                      data-confirm="Delete this chat permanently? This cannot be undone."
+                      data-confirm-title="Delete this chat"
+                      data-confirm-text="Delete chat"
+                      data-confirm-variant="danger">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash3 me-2" aria-hidden="true"></i>Delete chat</button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- MESSAGES DISPLAY AREA -->
+      <div class="chat-messages-area" id="chatMessagesArea" role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation messages">
+        <!-- Welcoming Introduction Message -->
+        <div class="chat-bubble chat-bubble-assistant">
+          <div class="small fw-semibold text-success mb-1"><i class="bi bi-chat-heart-fill me-1" aria-hidden="true"></i>MindBridge</div>
+          <div>
+            Hi {{ user.first_name }}, I'm MindBridge. Whatever you're carrying today, whether it's CA and exams, lodge stress,
+            family pressure or just feeling low, you can tell me here. It stays private.
+            <div class="mt-2 text-muted">How are you holding up right now?</div>
+          </div>
+        </div>
+
+        <!-- Render past messages in conversation -->
+        {% for msg in messages_list %}
+          {% if msg.role == 'user' %}
+            <div class="chat-bubble chat-bubble-user">
+              <div>{{ msg.content|linebreaksbr }}</div>
+              <span class="chat-bubble-time text-end">{{ msg.created_at|date:"H:i" }}</span>
+            </div>
+          {% else %}
+            <div class="chat-bubble chat-bubble-assistant {% if msg.risk_level == 'HIGH' or msg.risk_level == 'IMMINENT' %}chat-bubble-crisis{% endif %}">
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="badge {% if msg.risk_level == 'HIGH' or msg.risk_level == 'IMMINENT' %}bg-danger{% else %}bg-success{% endif %}">
+                  {% if msg.risk_level == 'HIGH' or msg.risk_level == 'IMMINENT' %}<i class="bi bi-shield-exclamation me-1" aria-hidden="true"></i> Urgent Safety Response{% else %}<i class="bi bi-chat-heart-fill me-1" aria-hidden="true"></i> MindBridge{% endif %}
+                </span>
+                <span class="chat-bubble-time">{{ msg.created_at|date:"H:i" }}</span>
+              </div>
+              <div class="chat-content-text" data-markdown>{{ msg.content }}</div>
+
+              <div class="chat-actions">
+                <button type="button" class="chat-action-btn js-copy-msg">
+                  <i class="bi bi-clipboard" aria-hidden="true"></i> Copy
+                </button>
+                <button type="button" class="chat-action-btn text-warning" onclick="openReportModal('{{ msg.id }}')">
+                  <i class="bi bi-flag" aria-hidden="true"></i> Report
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+
+        <!-- TYPING INDICATOR -->
+        <div class="typing-indicator" id="typingIndicator">
+          <small class="text-muted me-2">MindBridge is typing</small>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+      </div>
+
+      <!-- JUMP TO LATEST -->
+      <button type="button" class="chat-scroll-bottom" id="chatScrollBottom" aria-label="Jump to latest message">
+        <i class="bi bi-arrow-down" aria-hidden="true"></i>
+      </button>
+
+      <!-- QUICK SUGGESTION CHIPS -->
+      <div class="px-3 pt-3 pb-1 overflow-x-auto d-flex gap-2 border-top" id="quickChipsBar" aria-label="Suggested messages">
+        <button type="button" class="chip" onclick="applyQuickPrompt('CA and semester exams are fast approaching, and the syllabus is overwhelming me.')">
+          <i class="bi bi-journal-text" aria-hidden="true"></i> CA &amp; exam overwhelm
+        </button>
+        <button type="button" class="chip" onclick="applyQuickPrompt('I am terrified of having a carryover or spilling over. The fear of disappointing my family is choking me.')">
+          <i class="bi bi-hourglass-split" aria-hidden="true"></i> Carryover fear
+        </button>
+        <button type="button" class="chip" onclick="applyQuickPrompt('Living off-campus in Angwan Lambu with power cuts and heat is draining my mental energy.')">
+          <i class="bi bi-house" aria-hidden="true"></i> Lodge &amp; hostel stress
+        </button>
+        <button type="button" class="chip" onclick="applyQuickPrompt('I dey feel like everything just dey too much for me lately.')">
+          <i class="bi bi-chat-quote" aria-hidden="true"></i> Everything dey too much
+        </button>
+        <button type="button" class="chip" onclick="applyQuickPrompt('I feel anxious and my heart won\'t calm down. Can we do a grounding exercise?')">
+          <i class="bi bi-wind" aria-hidden="true"></i> Breathe with me
+        </button>
+      </div>
+
+      <!-- CHAT INPUT AREA -->
+      <div class="px-3 pb-3 pt-2">
+        <form id="chatForm" onsubmit="handleChatSubmit(event)">
+          {% csrf_token %}
+          <input type="hidden" id="conversationId" value="{{ current_conversation.id }}">
+          <input type="hidden" id="activeLanguage" value="{{ current_conversation.language }}">
+
+          <div class="composer">
+            <label for="chatInput" class="visually-hidden">Message MindBridge</label>
+            <textarea id="chatInput" rows="1"
+                      placeholder="Message MindBridge in English, Pidgin, or your own words&hellip;"
+                      onkeydown="handleKeyDown(event)" oninput="autoGrow(this)"></textarea>
+            <button class="composer-send" type="submit" id="sendBtn" aria-label="Send message">
+              <i class="bi bi-arrow-up fs-5" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-1 mt-2 composer-hint">
+            <span class="d-none d-md-inline"><kbd>Enter</kbd> to send &middot; <kbd>Shift</kbd>+<kbd>Enter</kbd> for a new line</span>
+            <span>In danger? Call <a href="tel:112" class="text-danger fw-semibold">112</a> or <a href="tel:08091116264" class="text-danger fw-semibold">0809 111 6264</a></span>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- RENAME CONVERSATION MODAL -->
+<div class="modal fade" id="renameConvModal" tabindex="-1" aria-hidden="true" aria-labelledby="renameConvModalLabel">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content shadow border-0" style="border-radius: 16px;">
+      <form method="POST" action="{% url 'conversations:rename_conversation' current_conversation.id %}">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h6 class="modal-title fw-bold" id="renameConvModalLabel">Rename Chat</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label class="form-label small fw-semibold" for="renameTitleInput">Conversation Title</label>
+          <input type="text" id="renameTitleInput" name="title" class="form-control" value="{{ current_conversation.title }}" required maxlength="150">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary-mb">Save Title</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const messagesArea = document.getElementById('chatMessagesArea');
+  const chatInput = document.getElementById('chatInput');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const sendBtn = document.getElementById('sendBtn');
+  let convId = document.getElementById('conversationId').value;
+  let isSending = false;
+
+  const LANG_NAMES = { en: 'English', pcm: 'Nigerian Pidgin', yo: 'Yoruba Context', ha: 'Hausa Context', ig: 'Igbo Context' };
+
+  function scrollToBottom() {
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+  }
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>'"]/g, ch => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[ch]));
+  }
+
+  function formatMarkdownText(str) {
+    // Minimal, XSS-safe markdown: escape first, then add bold/italic/line breaks.
+    let parsed = escapeHTML(String(str).trim());
+    parsed = parsed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    parsed = parsed.replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, '$1<em>$2</em>');
+    parsed = parsed.replace(/^#{1,3}\s*(.+)$/gm, '<strong>$1</strong>');
+    parsed = parsed.replace(/^\s*[-*]\s+(.+)$/gm, '&bull; $1');
+    parsed = parsed.replace(/\n/g, '<br>');
+    return parsed;
+  }
+
+  function timeNow() {
+    const now = new Date();
+    return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+  }
+
+  // Copy buttons read the raw text stored on the bubble (no inline JS strings).
+  messagesArea.addEventListener('click', function (event) {
+    const btn = event.target.closest('.js-copy-msg');
+    if (!btn) return;
+    const content = btn.closest('.chat-bubble').querySelector('.chat-content-text');
+    copyToClipboard(btn, content.dataset.raw || content.innerText);
+  });
+
+  // Render saved assistant messages with the same formatting as live ones.
+  document.querySelectorAll('.chat-content-text[data-markdown]').forEach(el => {
+    el.dataset.raw = el.textContent.trim();
+    el.innerHTML = formatMarkdownText(el.dataset.raw);
+  });
+
+  // Show the conversation's saved language in the selector.
+  (function initLanguage() {
+    const code = document.getElementById('activeLanguage').value;
+    if (LANG_NAMES[code]) document.getElementById('selectedLangDisplay').innerText = LANG_NAMES[code];
+  })();
+
+  scrollToBottom();
+
+  function autoGrow(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleChatSubmit(event);
+    }
+  }
+
+  function applyQuickPrompt(promptText) {
+    chatInput.value = promptText;
+    autoGrow(chatInput);
+    chatInput.focus();
+  }
+
+  function switchLanguage(langCode, langName) {
+    document.getElementById('activeLanguage').value = langCode;
+    document.getElementById('selectedLangDisplay').innerText = langName;
+    document.getElementById('currentLangLabel').innerText = langCode.toUpperCase();
+  }
+
+  function setSending(state) {
+    isSending = state;
+    sendBtn.disabled = state;
+    typingIndicator.style.display = state ? 'flex' : 'none';
+    if (state) scrollToBottom();
+  }
+
+  async function handleChatSubmit(event) {
+    if (event) event.preventDefault();
+    if (isSending) return;
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    const lang = document.getElementById('activeLanguage').value;
+
+    appendUserBubble(text);
+    chatInput.value = '';
+    autoGrow(chatInput);
+    setSending(true);
+
+    try {
+      const resp = await fetch('/api/chat/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken') || csrftoken || ''
+        },
+        body: JSON.stringify({ conversation_id: convId, message: text, language: lang })
+      });
+
+      let data = {};
+      try { data = await resp.json(); } catch (_) { /* non-JSON error page */ }
+
+      if (!resp.ok) {
+        let msg = "I couldn't process that just now. Please try again in a moment. If you are in danger, tap the Crisis Helplines button.";
+        if (resp.status === 429) msg = "You're sending messages quickly. Please wait a few seconds and try again. I'm still here.";
+        if (resp.status === 401 || resp.status === 403) msg = "Your session has expired. Please refresh the page or sign in again to keep chatting.";
+        appendAssistantBubble(msg, null, false, 'LOW');
+        return;
+      }
+
+      if (data.conversation_id) convId = data.conversation_id;
+      if (data.conversation_title) {
+        document.getElementById('activeConvTitle').innerText = data.conversation_title;
+      }
+
+      if (data.assistant_message) {
+        appendAssistantBubble(data.assistant_message.content, data.assistant_message.id, data.is_crisis, data.risk_level);
+        if (data.is_crisis) {
+          const crisisBtn = document.getElementById('headerCrisisBtn');
+          if (crisisBtn) crisisBtn.classList.add('btn-danger');
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      appendAssistantBubble("We experienced a network error. If you are in immediate need, please tap the Crisis Helplines button at the top of your screen.", null, true, 'HIGH');
+    } finally {
+      setSending(false);
+      scrollToBottom();
+      chatInput.focus();
+    }
+  }
+
+  function appendUserBubble(text) {
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-bubble-user';
+    bubble.innerHTML = `
+      <div>${escapeHTML(text).replace(/\n/g, '<br>')}</div>
+      <span class="chat-bubble-time text-end">${timeNow()}</span>
+    `;
+    messagesArea.insertBefore(bubble, typingIndicator);
+    scrollToBottom();
+  }
+
+  function appendAssistantBubble(text, msgId, isCrisis, riskLevel) {
+    const urgent = isCrisis || riskLevel === 'HIGH' || riskLevel === 'IMMINENT';
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble chat-bubble-assistant' + (urgent ? ' chat-bubble-crisis' : '');
+
+    const badge = urgent
+      ? '<span class="badge bg-danger"><i class="bi bi-shield-exclamation me-1"></i> Urgent Safety Response</span>'
+      : '<span class="badge bg-success"><i class="bi bi-chat-heart-fill me-1"></i> MindBridge</span>';
+
+    const safeId = msgId ? String(msgId).replace(/[^a-zA-Z0-9-]/g, '') : '';
+    const actions = safeId ? `
+      <div class="chat-actions">
+        <button type="button" class="chat-action-btn js-copy-msg"><i class="bi bi-clipboard"></i> Copy</button>
+        <button type="button" class="chat-action-btn text-warning" onclick="openReportModal('${safeId}')"><i class="bi bi-flag"></i> Report</button>
+      </div>` : '';
+
+    bubble.innerHTML = `
+      <div class="d-flex align-items-center justify-content-between mb-1">
+        ${badge}
+        <span class="chat-bubble-time">${timeNow()}</span>
+      </div>
+      <div class="chat-content-text"></div>
+      ${actions}
+    `;
+    const contentEl = bubble.querySelector('.chat-content-text');
+    contentEl.dataset.raw = text;
+    contentEl.innerHTML = formatMarkdownText(text);
+    messagesArea.insertBefore(bubble, typingIndicator);
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /chat/
+Disallow: /conversations/
+Disallow: /dashboard/
+Disallow: /mood/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /export-data/
+Disallow: /delete-account/

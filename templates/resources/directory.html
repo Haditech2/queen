@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mental Health Organizations & NGOs - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-diagram-3" aria-hidden="true"></i>Mental health organizations &amp; NGOs</h1>
+      <p class="page-sub">Advocacy groups, youth initiatives, and community organizations fighting mental health stigma across Nigeria.</p>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'resources:crisis_support' %}" class="btn btn-outline-danger">
+        <i class="bi bi-life-preserver me-1" aria-hidden="true"></i> Crisis hub
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    {% for res in crisis_resources %}
+    <div class="col-md-6 col-lg-4">
+      <div class="mb-card h-100 p-4 d-flex flex-column justify-content-between mb-card-interactive">
+        <div>
+          <span class="badge bg-danger mb-2">{{ res.get_service_type_display }}</span>
+          <h2 class="h5 fw-bold mb-1">{{ res.organization }}</h2>
+          <p class="small text-muted mb-3">{{ res.description }}</p>
+        </div>
+        <div class="pt-2 border-top d-flex justify-content-between align-items-center gap-2">
+          <a href="tel:{{ res.phone }}" class="btn btn-sm btn-outline-danger">{{ res.phone }}</a>
+          {% if res.website %}
+          <a href="{{ res.website }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-light border">Website</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="empty-state">
+        <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
+        <h2 class="h6 fw-bold mb-1">No organizations listed yet</h2>
+        <p class="mb-0">Verified advocacy groups and community organizations will appear here.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

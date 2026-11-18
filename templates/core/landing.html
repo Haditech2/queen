@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}MindBridge Chatbot - Mental Health Support That Understands Your Context{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <span class="eyebrow enter">Support chatbot &middot; Nasarawa State University, Keffi</span>
+        <h1 class="hero-title mt-3 mb-4 enter enter-2">Talk it through.<br><em>Any time.</em></h1>
+        <p class="hero-tagline mb-4 enter enter-3">
+          MindBridge is a private chatbot for NSUK students and staff. Bring CA pressure, carryover fears, lodge wahala
+          or family expectations, in English or Pidgin. It listens, helps you steady yourself, and connects you to a
+          real person the moment you are not safe.
+        </p>
+
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-2 enter enter-4">
+          <a href="{% url 'accounts:register' %}" class="btn btn-primary-mb btn-lg px-4">
+            Start Chatting <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+          </a>
+          <a href="{% url 'accounts:login' %}" class="btn btn-outline-mb btn-lg px-4">Sign in</a>
+        </div>
+        <p class="hero-note mb-4 enter enter-4">Free. Takes under a minute to set up. Your chats stay private.</p>
+
+        <ul class="hero-trust enter enter-4">
+          <li><i class="bi bi-shield-lock" aria-hidden="true"></i>Private by default</li>
+          <li><i class="bi bi-translate" aria-hidden="true"></i>English &amp; Pidgin</li>
+          <li><i class="bi bi-clipboard2-x" aria-hidden="true"></i>Never diagnoses</li>
+          <li><i class="bi bi-telephone" aria-hidden="true"></i>Crisis lines built in</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-6 enter enter-3">
+        <!-- Product preview: mirrors the real chat screen -->
+        <div class="app-preview" aria-label="Preview of the MindBridge chat screen">
+          <div class="app-preview-bar">
+            <div class="d-flex align-items-center gap-2">
+              <span class="brand-mark" aria-hidden="true"><i class="bi bi-chat-heart-fill"></i></span>
+              <div>
+                <div class="app-preview-title">Exam week worries</div>
+                <div class="app-preview-sub"><span class="status-dot"></span>MindBridge is here</div>
+              </div>
+            </div>
+            <span class="pill"><i class="bi bi-translate" aria-hidden="true"></i> Nigerian Pidgin</span>
+          </div>
+
+          <div class="app-preview-body">
+            <div class="chat-bubble chat-bubble-user">
+              CA timetable don drop, light no dey my lodge, and I dey fear carryover. My chest just dey tight.
+            </div>
+            <div class="chat-bubble chat-bubble-assistant">
+              <div class="small fw-semibold text-success mb-1"><i class="bi bi-chat-heart-fill me-1" aria-hidden="true"></i>MindBridge</div>
+              Sannu. That pressure, plus no light, fit make your heart race. Let's take one slow breath together first.
+              You no need to face the whole semester tonight. Which course dey worry you pass?
+            </div>
+            <div class="chat-bubble chat-bubble-user">Na GST 211. I never even start.</div>
+          </div>
+
+          <div class="app-preview-composer" aria-hidden="true">
+            <span>Message MindBridge&hellip;</span>
+            <span class="send"><i class="bi bi-arrow-up"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CRISIS STRIP -->
+<section class="crisis-strip py-3">
+  <div class="container d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+    <div class="fw-semibold"><i class="bi bi-exclamation-octagon me-2" aria-hidden="true"></i>In danger or thinking of ending your life? Call a person now.</div>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="tel:08036152891" class="crisis-link"><i class="bi bi-hospital" aria-hidden="true"></i> NSUK Clinic 0803 615 2891</a>
+      <a href="tel:08035901234" class="crisis-link">FMC Keffi 0803 590 1234</a>
+      <a href="tel:08091116264" class="crisis-link">MANI 0809 111 6264</a>
+      <a href="tel:112" class="crisis-link">112</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT TO TALK ABOUT -->
+<section class="section">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-5">
+        <span class="eyebrow">What you can bring</span>
+        <h2 class="section-title mt-2 mb-3">Made for campus life in Keffi, not a generic script.</h2>
+        <p class="section-lede">
+          Replies are shaped by your faculty, level, where you stay and the tone you prefer, so it can talk about
+          your actual week instead of offering stock advice.
+        </p>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary-mb mt-2">Start Chatting</a>
+      </div>
+      <div class="col-lg-7">
+        <ul class="topic-list">
+          <li>
+            <span class="topic-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></span>
+            <h3>Exams, CA and carryover fear</h3>
+            <p>Break a heavy semester into the next small step, and talk through the dread of spillover.</p>
+          </li>
+          <li>
+            <span class="topic-icon"><i class="bi bi-house" aria-hidden="true"></i></span>
+            <h3>Lodge and hostel life</h3>
+            <p>Heat, power cuts, generator noise and roommate tension in Angwan Lambu, High Level or on campus.</p>
+          </li>
+          <li>
+            <span class="topic-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+            <h3>Family and money pressure</h3>
+            <p>Expectations from home, "black tax", and setting boundaries without guilt.</p>
+          </li>
+          <li>
+            <span class="topic-icon"><i class="bi bi-wind" aria-hidden="true"></i></span>
+            <h3>Calming down, right now</h3>
+            <p>Ask for box breathing, 5-4-3-2-1 grounding or a study reset and it walks you through it in the chat.</p>
+          </li>
+          <li>
+            <span class="topic-icon"><i class="bi bi-translate" aria-hidden="true"></i></span>
+            <h3>Your own words</h3>
+            <p>Write in English, Pidgin or with Hausa expressions like "sannu" and "hankuri". Switch language mid-chat.</p>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ONE PLACE: FEATURE GRID -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="row align-items-end g-3 mb-4">
+      <div class="col-lg-7">
+        <span class="eyebrow">Everything in one place</span>
+        <h2 class="section-title mt-2 mb-0">A chat, a toolkit, and a directory of real humans.</h2>
+      </div>
+      <div class="col-lg-5">
+        <p class="section-lede mb-0">
+          The chatbot is one part of the support. The rest of the platform is built around the same promise: never
+          diagnose, always signpost, always respect your context.
+        </p>
+      </div>
+    </div>
+
+    <div class="feature-grid">
+      <a class="feature-card" href="{% url 'accounts:register' %}">
+        <span class="feature-card-icon"><i class="bi bi-chat-heart-fill" aria-hidden="true"></i></span>
+        <h3>Support chat</h3>
+        <p>Talk in English, Pidgin or your own words. Replies shaped by your faculty, level and where you live.</p>
+        <span class="feature-link">Start a conversation <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="feature-card" href="{% url 'coping:list' %}">
+        <span class="feature-card-icon"><i class="bi bi-flower1" aria-hidden="true"></i></span>
+        <h3>Coping toolkit</h3>
+        <p>Guided box breathing, grounding and grounding exercises you can follow step by step, right in the page.</p>
+        <span class="feature-link">Browse exercises <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="feature-card" href="{% url 'screening:list' %}">
+        <span class="feature-card-icon"><i class="bi bi-clipboard2-check" aria-hidden="true"></i></span>
+        <h3>Self-assessment</h3>
+        <p>Standardised PHQ-9 and GAD-7 screeners. Non-diagnostic, private, and saved only with your consent.</p>
+        <span class="feature-link">Take a screener <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="feature-card" href="{% url 'mood:dashboard' %}">
+        <span class="feature-card-icon"><i class="bi bi-emoji-smile" aria-hidden="true"></i></span>
+        <h3>Mood tracker</h3>
+        <p>Two minutes a day to name stress, sleep and mood — so you can see patterns before they build up.</p>
+        <span class="feature-link">Check in <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="feature-card" href="{% url 'professionals:directory' %}">
+        <span class="feature-card-icon"><i class="bi bi-person-lines-fill" aria-hidden="true"></i></span>
+        <h3>Find a professional</h3>
+        <p>Verified psychiatrists, psychologists and teaching hospitals across Nigeria — filterable by state and mode.</p>
+        <span class="feature-link">Open the directory <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a class="feature-card" href="{% url 'resources:crisis_support' %}">
+        <span class="feature-card-icon is-signal"><i class="bi bi-life-preserver" aria-hidden="true"></i></span>
+        <h3>Crisis support hub</h3>
+        <p>Free, verified 24/7 Nigerian hotlines with one-tap calling. Open it before you need it, not during.</p>
+        <span class="feature-link">See the hotlines <i class="bi bi-arrow-right" aria-hidden="true"></i></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- SAFETY PIPELINE -->
+<section class="section">
+  <div class="container">
+    <span class="eyebrow">How it stays safe</span>
+    <h2 class="section-title mt-2 mb-3">Every message goes through a Safety Pipeline.</h2>
+    <p class="section-lede mb-5">Your message is checked before the AI sees it, and the reply is checked again before you do.</p>
+
+    <ol class="pipeline">
+      <li>
+        <h3>You write</h3>
+        <p>Your message is validated and stored only in your private history.</p>
+      </li>
+      <li class="is-safety">
+        <h3>Crisis check</h3>
+        <p>Risk is rated low to imminent. High risk skips the AI and shows emergency contacts.</p>
+      </li>
+      <li>
+        <h3>Your context</h3>
+        <p>Language, tone and campus details are added so the reply fits you.</p>
+      </li>
+      <li>
+        <h3>AI reply</h3>
+        <p>Gemini, or another configured model, drafts a short, warm response.</p>
+      </li>
+      <li class="is-safety">
+        <h3>Reply review</h3>
+        <p>Anything that diagnoses, prescribes or stereotypes is blocked and replaced.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="audience-band py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <span class="eyebrow" style="color:#8fd9bb;">Who it is for</span>
+        <h2 class="mt-2" style="font-size:clamp(1.6rem,3vw,2.2rem);">Built around the people who actually need it.</h2>
+        <p class="mt-3 mb-0" style="color:rgba(255,255,255,.74);font-size:.95rem;max-width:46ch;">
+          MindBridge was shaped with NSUK students and staff, but the boundaries it keeps — no diagnosis, no
+          medication advice, no stereotypes — matter everywhere.
+        </p>
+      </div>
+      <div class="col-lg-8">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="audience-card">
+              <h3><i class="bi bi-mortarboard-fill me-2" aria-hidden="true"></i>Undergraduates</h3>
+              <p>CA deadlines, carryover dread, lodge life and the pressure to be the family's "success story".</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="audience-card">
+              <h3><i class="bi bi-briefcase-fill me-2" aria-hidden="true"></i>Staff and lecturers</h3>
+              <p>Workload, promotion pressure and carrying other people's problems without a private outlet.</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="audience-card">
+              <h3><i class="bi bi-people-fill me-2" aria-hidden="true"></i>Parents &amp; guardians</h3>
+              <p>Concerned about a child away at school and unsure where the line between support and policing sits.</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="audience-card">
+              <h3><i class="bi bi-globe2 me-2" aria-hidden="true"></i>Nigerian youths anywhere</h3>
+              <p>Joblessness, inflation and online pressure — a first-line listener that speaks your language.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLEDGE -->
+<section class="section">
+  <div class="container">
+    <div class="pledge">
+      <span class="eyebrow">Our boundaries</span>
+      <h2 class="section-title mt-2 mb-3">A good listener, not a doctor.</h2>
+      <p class="mb-4">
+        MindBridge will never tell you that you have a condition, never suggest medication, and never pretend to
+        replace a counsellor or clinician. When you need one, it points you to the NSUK Health Centre, the Guidance
+        &amp; Counselling Unit or FMC Keffi.
+      </p>
+      <div class="d-flex flex-wrap gap-3">
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary-mb">Start Chatting</a>
+        <a href="{% url 'core:about' %}" class="btn btn-outline-mb">About the chatbot</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4">
+        <span class="eyebrow">Questions</span>
+        <h2 class="section-title mt-2 mb-3">The things people ask first.</h2>
+        <p class="section-lede">
+          If your question is not here, the
+          <a href="{% url 'core:about' %}">About page</a> explains the design in full.
+        </p>
+      </div>
+      <div class="col-lg-8">
+        <div class="faq-list" id="faqAccordion">
+          <div class="faq-item">
+            <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq1"
+                    aria-expanded="true" aria-controls="faq1">
+              Is MindBridge a replacement for a counsellor or doctor?
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="collapse show" id="faq1">
+              <div class="faq-answer">
+                <p>
+                  No, and it is designed so it cannot become one. MindBridge does not diagnose, prescribe, or give
+                  medication advice. When a conversation suggests you need professional care, the bot gives you
+                  verified Nigerian contacts — including the NSUK Health Centre and FMC Keffi psychiatry — rather than
+                  continuing to chat as though it were a clinician.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq2"
+                    aria-expanded="false" aria-controls="faq2">
+              Who can see my conversations?
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="collapse" id="faq2">
+              <div class="faq-answer">
+                <p>
+                  Your chats are stored against your own account and are not shared with your department, your
+                  faculty, or university administration. Your transcript is never used to train public AI models
+                  without explicit consent. You can export everything as JSON, or delete your account and all records
+                  permanently, at any time from Privacy &amp; Settings.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq3"
+                    aria-expanded="false" aria-controls="faq3">
+              Can I talk in Nigerian Pidgin?
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="collapse" id="faq3">
+              <div class="faq-answer">
+                <p>
+                  Yes. You can write in English, Nigerian Pidgin, or use Hausa, Yoruba and Igbo expressions. You can
+                  switch language mid-conversation from the language selector in the chat header, and set a default
+                  tone and pace in your profile so replies match how you prefer to be spoken to.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq4"
+                    aria-expanded="false" aria-controls="faq4">
+              What happens if I say something that suggests I might be in danger?
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="collapse" id="faq4">
+              <div class="faq-answer">
+                <p>
+                  Every message is screened for risk before it reaches the model. At higher risk levels the AI is
+                  skipped entirely, the reply switches to an urgent safety response, and verified emergency numbers
+                  are placed in front of you — with one-tap calling. You can also open the crisis hub yourself at any
+                  time from the "Urgent help" button.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq5"
+                    aria-expanded="false" aria-controls="faq5">
+              Is it free?
+              <i class="bi bi-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="collapse" id="faq5">
+              <div class="faq-answer">
+                <p>
+                  Yes. MindBridge, the coping toolkit, the self-assessment screeners and the mood tracker are all
+                  free. The helplines in the crisis hub are free or toll-free too.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="section">
+  <div class="container">
+    <div class="cta-band">
+      <span class="eyebrow">When you're ready</span>
+      <h2 class="mt-2">You don't have to carry it alone, or carry it all at once.</h2>
+      <p class="mb-4">
+        Set up a private space in under a minute. Bring the semester, the family, the money, or the feeling you
+        cannot name yet.
+      </p>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary-mb btn-lg px-4">
+          Start Chatting <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+        </a>
+        <a href="{% url 'coping:list' %}" class="btn btn-outline-mb btn-lg px-4">Try a calming exercise</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,1 @@
+"""Coping toolkit app package."""

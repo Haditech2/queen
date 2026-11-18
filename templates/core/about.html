@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About MindBridge - Culturally Attuned Mental Health Support{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 880px;">
+  <div class="page-header">
+    <div>
+      <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+        Our mission &amp; ethics
+      </span>
+      <h1 class="page-title">About MindBridge</h1>
+      <p class="page-sub" style="font-size:1.05rem;">"Mental health support that understands your context."</p>
+    </div>
+  </div>
+
+  <div class="mb-card p-4 p-md-5">
+    <p class="fs-6 text-dark">
+      MindBridge was developed to bridge the critical gap in culturally sensitive first-line mental health support across Nigeria and the wider African continent. In many traditional models, digital wellness tools are designed around Western individualistic frameworks that ignore extended family dynamics, communal expectations, economic hustle, faith traditions, and social realities.
+    </p>
+
+    <h2 class="h5 fw-bold text-dark mt-4 mb-3">Our fundamental principles</h2>
+    <div class="row g-3 my-2">
+      <div class="col-md-6">
+        <div class="p-3 border rounded-3 bg-light h-100">
+          <h3 class="h6 fw-bold text-success mb-1"><i class="bi bi-shield-x me-1" aria-hidden="true"></i>Never a doctor or diagnosis</h3>
+          <p class="small text-muted mb-0">MindBridge will never claim to be a psychologist, doctor, or psychiatrist, and will never formulate clinical diagnoses.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 border rounded-3 bg-light h-100">
+          <h3 class="h6 fw-bold text-success mb-1"><i class="bi bi-chat-quote me-1" aria-hidden="true"></i>Ask, rather than assume</h3>
+          <p class="small text-muted mb-0">We never stereotype users by ethnic origin, religion, or community. Every individual is respected uniquely.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 border rounded-3 bg-light h-100">
+          <h3 class="h6 fw-bold text-success mb-1"><i class="bi bi-translate me-1" aria-hidden="true"></i>Authentic linguistic tone</h3>
+          <p class="small text-muted mb-0">Code-switch comfortably between English, Nigerian Pidgin, and local cultural idioms without parody.</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 border rounded-3 bg-light h-100">
+          <h3 class="h6 fw-bold text-success mb-1"><i class="bi bi-heart-pulse me-1" aria-hidden="true"></i>Immediate life safety first</h3>
+          <p class="small text-muted mb-0">Any indications of self-harm or suicidal crisis trigger immediate connection to verified Nigerian hotlines.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- CASE STUDY: NASARAWA STATE UNIVERSITY, KEFFI (NSUK) -->
+    <div class="p-4 rounded-3 bg-light border mb-4">
+      <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+        <span class="badge bg-success text-white"><i class="bi bi-mortarboard-fill me-1" aria-hidden="true"></i> Academic case study</span>
+        <span class="badge bg-white text-dark border">Keffi, Nasarawa State</span>
+      </div>
+      <h3 class="h5 fw-bold text-dark mb-2">Institutional case study: Nasarawa State University, Keffi</h3>
+      <p class="text-secondary small mb-3">
+        Nasarawa State University, Keffi (NSUK) was selected as the focal case study for the MindBridge pilot implementation. Tertiary students in Nigerian state universities encounter high psychological strain characterized by compressed academic calendars, continuous assessments, fear of carryovers, and off-campus housing dynamics.
+      </p>
+
+      <h4 class="h6 fw-bold text-dark mb-2">1. The Keffi student context</h4>
+      <p class="text-secondary small mb-3">
+        Over 75% of NSUK students reside in surrounding off-campus communities such as <strong>Angwan Lambu</strong>, <strong>High Level</strong>, <strong>Total Junction</strong>, and <strong>Gidan Zakari</strong>. Students frequently contend with erratic electricity for revision, elevated daytime temperatures, long treks to the Main Campus along Keffi-Akwanga Road, and financial anxiety ("survival hustle"). Traditional mental health initiatives often fail because of deep-seated academic stigma and fear of institutional judgment.
+      </p>
+
+      <h4 class="h6 fw-bold text-dark mb-2">2. Three-tier referral &amp; safety triad</h4>
+      <div class="row g-2 mb-3">
+        <div class="col-md-4">
+          <div class="p-3 bg-white rounded-3 border h-100">
+            <span class="badge bg-success mb-1">Tier 1: On-campus triage</span>
+            <div class="fw-bold small text-dark">NSUK University Health Services</div>
+            <p class="text-muted mb-2" style="font-size: 0.75rem;">Main Campus Health Centre (Keffi Clinic). Walk-in primary health and psychiatric triage.</p>
+            <div class="fw-bold text-success small"><i class="bi bi-telephone me-1" aria-hidden="true"></i>0803 615 2891</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-white rounded-3 border h-100">
+            <span class="badge bg-danger mb-1">Tier 2: Clinical psychiatry</span>
+            <div class="fw-bold small text-dark">FMC Keffi (Psychiatry Dept)</div>
+            <p class="text-muted mb-2" style="font-size: 0.75rem;">Department of Behavioral Medicine &amp; Psychiatry. Tertiary specialized inpatient and outpatient care.</p>
+            <div class="fw-bold text-danger small"><i class="bi bi-telephone me-1" aria-hidden="true"></i>0803 590 1234</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 bg-white rounded-3 border h-100">
+            <span class="badge bg-primary mb-1">Tier 3: Guidance &amp; counsel</span>
+            <div class="fw-bold small text-dark">NSUK Guidance &amp; Counselling</div>
+            <p class="text-muted mb-2" style="font-size: 0.75rem;">Faculty of Education / Student Affairs Division. Academic, vocational, and interpersonal guidance.</p>
+            <div class="fw-bold text-primary small"><i class="bi bi-telephone me-1" aria-hidden="true"></i>0802 345 6789</div>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="h6 fw-bold text-dark mb-2">3. Non-diagnostic, stigma-free safe haven</h4>
+      <p class="text-secondary small mb-0">
+        MindBridge provides NSUK students with an anonymous, un-monitored safe haven. It strictly respects academic privacy: no student conversation is linked to transcript records or departmental scrutiny. When elevated emotional risk or suicidal ideation is detected, the platform transparently guides the student to immediate human care without coercive punitive measures.
+      </p>
+    </div>
+
+    <h2 class="h5 fw-bold text-dark mt-4 mb-2">Verified professional human ecosystem</h2>
+    <p class="text-secondary small mb-0">
+      Digital support can provide comfort, breathing techniques, and reflection, but when professional care is needed, human doctors, clinical psychologists, and therapists are essential. That is why MindBridge maintains an actively verified
+      <a href="{% url 'professionals:directory' %}">directory of Nigerian psychiatric centers and accredited clinics</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}

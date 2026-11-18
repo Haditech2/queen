@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mental Health Self-Assessment Screeners - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-clipboard2-check" aria-hidden="true"></i>Self-reflection questionnaires</h1>
+      <p class="page-sub">Evidence-informed clinical screening tools to help you understand your emotional symptoms.</p>
+    </div>
+    <div class="page-actions">
+      <span class="badge bg-warning-subtle text-dark border border-warning-subtle p-2">
+        <i class="bi bi-shield-exclamation me-1" aria-hidden="true"></i> Screening tools only &mdash; never a diagnosis
+      </span>
+    </div>
+  </div>
+
+  <div class="alert alert-light border shadow-sm p-4 rounded-3 mb-4">
+    <h2 class="h6 fw-bold text-dark mb-1"><i class="bi bi-info-circle-fill text-success me-2" aria-hidden="true"></i>Important medical &amp; diagnostic notice</h2>
+    <p class="small text-muted mb-0">
+      These validated questionnaires (PHQ and GAD) are <strong>screening instruments, not medical diagnoses</strong>. They are intended solely to help you reflect on whether scheduling an appointment with a qualified human mental health healthcare professional could be beneficial. Results are saved only with your consent.
+    </p>
+  </div>
+
+  <!-- TOOLS GRID -->
+  <div class="row g-4 mb-5">
+    {% for key, tool in tools.items %}
+    <div class="col-md-6">
+      <div class="mb-card h-100 p-4 d-flex flex-column justify-content-between mb-card-interactive">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-success-subtle text-success border border-success-subtle">{{ key }}</span>
+            <small class="text-muted"><i class="bi bi-clock me-1" aria-hidden="true"></i>~{% if '2' in key %}2{% else %}4{% endif %} mins</small>
+          </div>
+          <h2 class="h5 fw-bold mb-2">{{ tool.name }}</h2>
+          <p class="text-muted small mb-3">{{ tool.description }}</p>
+        </div>
+
+        <div class="pt-3 border-top">
+          <a href="{% url 'screening:detail' key %}" class="btn btn-primary-mb w-100">
+            <i class="bi bi-pencil-square me-1" aria-hidden="true"></i> Begin {{ key }} assessment
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- PAST SCREENING SESSIONS TABLE -->
+  <div class="mb-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <h2 class="h6 fw-bold mb-0"><i class="bi bi-clock-history text-success me-2" aria-hidden="true"></i>Your past screening reflections</h2>
+      <span class="badge bg-light text-muted border">Private</span>
+    </div>
+
+    {% if past_sessions %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-table mb-table-stack">
+          <thead class="table-light small">
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Questionnaire</th>
+              <th scope="col">Total score</th>
+              <th scope="col">Interpretation severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in past_sessions %}
+            <tr>
+              <td data-label="Date" class="small text-nowrap">{{ s.completed_at|date:"M d, Y, H:i" }}</td>
+              <td data-label="Questionnaire" class="fw-semibold">{{ s.tool.name }}</td>
+              <td data-label="Score"><span class="badge bg-dark">{{ s.total_score }}</span></td>
+              <td data-label="Severity">
+                <span class="badge bg-success-subtle text-success border border-success-subtle">
+                  {{ s.severity_label }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-clipboard2-x"></i></span>
+        <h3 class="h6 fw-bold mb-1">You have not completed any self-assessments yet</h3>
+        <p class="mb-0">When you complete a screener, the result appears here so you can track your own progress.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

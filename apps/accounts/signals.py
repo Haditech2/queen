@@ -1,0 +1,16 @@
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from .models import CustomUser, UserProfile
+
+@receiver(post_save, sender=CustomUser)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(
+            user=instance,
+            comfortable_support_systems=['family', 'friends', 'professional']
+        )
+    else:
+        if hasattr(instance, 'profile'):
+            instance.profile.save()
+        else:
+            UserProfile.objects.create(user=instance)

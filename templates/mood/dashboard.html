@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Daily Mood & Emotional Check-in - MindBridge{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="bi bi-emoji-smile" aria-hidden="true"></i>Daily emotional check-in</h1>
+      <p class="page-sub">Build self-reflection and track trends in your stress, sleep, and emotional rhythm.</p>
+    </div>
+    <div class="page-actions">
+      <div class="stat-tile" style="min-width: 190px;">
+        <span class="stat-tile-label">Average recent stress</span>
+        <span class="stat-tile-value">{{ avg_stress }}<small style="font-size:.5em;color:var(--ink-muted);">/10</small></span>
+        <span class="stat-tile-note">{{ checkin_count }} entries recorded</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- CHECK-IN FORM CARD -->
+    <div class="col-lg-5">
+      <div class="mb-card p-4">
+        <h2 class="h6 fw-bold mb-3"><i class="bi bi-calendar-heart text-success me-2" aria-hidden="true"></i>How are you feeling today?</h2>
+
+        <form method="POST" data-loading-label="Saving…">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <span class="form-label d-block" id="moodLabel">Select current mood</span>
+            <div class="row g-2" role="radiogroup" aria-labelledby="moodLabel">
+              {% for option in mood_options %}
+              <div class="col-6 col-md-4">
+                <label class="option-card mood-option">
+                  <input type="radio" name="mood" value="{{ option.value }}"
+                         {% if form.mood.value == option.value %}checked{% endif %} required>
+                  <span class="mood-emoji" aria-hidden="true">{{ option.emoji }}</span>
+                  <span class="option-label">{{ option.label }}</span>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label mb-0" for="{{ form.stress_level.id_for_label }}">Stress level</label>
+              <span class="badge bg-success" id="stressDisplay">5 / 10</span>
+            </div>
+            {{ form.stress_level }}
+            <div class="d-flex justify-content-between small text-muted mt-1">
+              <span>1 &middot; At peace</span>
+              <span>5 &middot; Manageable</span>
+              <span>10 &middot; In crisis</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.sleep_quality.id_for_label }}">Sleep quality last night</label>
+            {{ form.sleep_quality }}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="{{ form.note.id_for_label }}">
+              Personal reflection note <span class="text-muted fw-normal">(optional &amp; 100% private)</span>
+            </label>
+            {{ form.note }}
+          </div>
+
+          <button type="submit" class="btn btn-primary-mb w-100 py-2 fw-bold">
+            <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Save daily reflection
+          </button>
+        </form>
+
+        <div class="alert alert-light border mt-4 p-3 rounded-3 small text-muted mb-0">
+          <i class="bi bi-info-circle-fill text-success me-1" aria-hidden="true"></i>
+          <strong>Privacy &amp; non-medical notice:</strong> Mood entries are private. MindBridge does not diagnose or make medical determinations based on your mood history.
+        </div>
+      </div>
+    </div>
+
+    <!-- MOOD HISTORY TIMELINE CARD -->
+    <div class="col-lg-7">
+      <div class="mb-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <h2 class="h6 fw-bold mb-0"><i class="bi bi-journal-text text-success me-2" aria-hidden="true"></i>Your private mood history</h2>
+          <span class="badge bg-light text-muted border">Last 30 days</span>
+        </div>
+
+        {% if recent_checkins %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-table mb-table-stack">
+              <thead class="table-light small">
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Mood</th>
+                  <th scope="col">Stress</th>
+                  <th scope="col">Sleep</th>
+                  <th scope="col">Reflection note</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for checkin in recent_checkins %}
+                <tr>
+                  <td data-label="Date" class="small fw-semibold text-nowrap">{{ checkin.created_at|date:"M d, Y" }}</td>
+                  <td data-label="Mood">
+                    <span class="text-end"><span class="fs-5 me-1" aria-hidden="true">{{ checkin.mood_emoji }}</span><span class="small fw-medium">{{ checkin.get_mood_display }}</span></span>
+                  </td>
+                  <td data-label="Stress">
+                    <span class="badge {% if checkin.stress_level <= 3 %}bg-success{% elif checkin.stress_level <= 6 %}bg-warning text-dark{% else %}bg-danger{% endif %} rounded-pill">
+                      {{ checkin.stress_level }}/10
+                    </span>
+                  </td>
+                  <td data-label="Sleep" class="small text-muted">{{ checkin.get_sleep_quality_display|truncatewords:2 }}</td>
+                  <td data-label="Note" class="small text-muted" style="max-width: 220px;">
+                    {% if checkin.note %}
+                      {{ checkin.note|truncatechars:45 }}
+                    {% else %}
+                      <span class="fst-italic">None</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <span class="empty-state-icon" aria-hidden="true"><i class="bi bi-calendar2-heart"></i></span>
+            <h3 class="h6 fw-bold mb-1">No mood check-ins recorded yet</h3>
+            <p class="mb-0">Select your mood on the left to start your wellbeing journey.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

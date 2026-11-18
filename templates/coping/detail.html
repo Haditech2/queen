@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ tool.title }} - MindBridge Coping Toolkit{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 860px;">
+  <nav class="mb-breadcrumb" aria-label="Breadcrumb">
+    <a href="{% url 'coping:list' %}">Coping toolkit</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <span aria-current="page">{{ tool.title }}</span>
+  </nav>
+
+  <div class="page-header">
+    <div>
+      <div class="d-flex flex-wrap gap-2 mb-2">
+        <span class="badge bg-success-subtle text-success border border-success-subtle">{{ tool.get_category_display }}</span>
+        <span class="badge bg-light text-muted border"><i class="bi bi-clock me-1" aria-hidden="true"></i>{{ tool.duration_minutes }} minutes</span>
+      </div>
+      <h1 class="page-title">{{ tool.title }}</h1>
+    </div>
+    <div class="page-actions">
+      <a href="{% url 'coping:list' %}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-1" aria-hidden="true"></i> All exercises
+      </a>
+    </div>
+  </div>
+
+  <div class="mb-card p-4 p-md-5 mb-4">
+    <p class="fs-6 text-secondary mb-4">{{ tool.overview }}</p>
+
+    <!-- SPECIAL INTERACTIVE VISUALIZER FOR BOX BREATHING -->
+    {% if tool.slug == 'box-breathing' %}
+    <div class="p-4 p-md-5 bg-light rounded-3 text-center my-4 border">
+      <div id="breathingCircle" class="breathing-box" role="img" aria-label="Breathing guide circle">
+        <div class="breathing-label" id="breathingLabel">Ready</div>
+        <div class="breathing-counter" id="breathingCounter">4</div>
+      </div>
+      <div class="mt-3">
+        <button type="button" class="btn btn-primary-mb px-4 py-2 fw-bold" id="breathingToggleBtn" onclick="toggleBreathing()">
+          <i class="bi bi-play-fill" aria-hidden="true"></i> Start breathing
+        </button>
+      </div>
+      <small class="text-muted d-block mt-3">Follow the circle as it expands and shrinks with 4-second intervals.</small>
+    </div>
+    {% endif %}
+
+    <!-- STEP-BY-STEP EXERCISE CARDS -->
+    <h2 class="h6 fw-bold mb-3 mt-4"><i class="bi bi-list-check text-success me-2" aria-hidden="true"></i>Guided instructions</h2>
+    <ol class="d-flex flex-column gap-3 mb-4" style="list-style: none; padding: 0; margin: 0;">
+      {% for step in tool.steps %}
+      <li class="p-3 border rounded-3 bg-white d-flex gap-3 align-items-start">
+        <span class="badge bg-success text-white rounded-pill px-2" aria-hidden="true">{{ forloop.counter }}</span>
+        <div>
+          <h3 class="h6 fw-bold mb-1 text-dark">{{ step.title }}</h3>
+          <p class="mb-1 text-secondary">{{ step.instruction }}</p>
+          {% if step.hint %}
+          <small class="text-muted fst-italic"><i class="bi bi-lightbulb text-warning me-1" aria-hidden="true"></i>{{ step.hint }}</small>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+
+    <!-- DISCLAIMER (Section 14) -->
+    <div class="alert alert-light border small text-muted mb-0">
+      <i class="bi bi-shield-check text-success me-1" aria-hidden="true"></i>
+      <strong>Notice:</strong> {{ tool.disclaimer }}
+    </div>
+  </div>
+
+  <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+    <a href="{% url 'conversations:chat_new' %}" class="btn btn-primary-mb">
+      <i class="bi bi-chat-heart me-1" aria-hidden="true"></i> Reflect in chat
+    </a>
+    <a href="{% url 'coping:list' %}" class="btn btn-outline-mb">
+      Explore other exercises
+    </a>
+  </div>
+</div>
+{% endblock %}
